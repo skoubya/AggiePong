@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="Player.js"></script>
+<script type="text/javascript" src='http://students.cse.tamu.edu/skoubya/AggiePong/Player.js'></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+	var socket = io();
+	$(document).keydown(function(event){
+		socket.emit('keydown', event.which); 
+	});
+	$(document).keyup(function(event){
+		socket.emit('keyup', event.which); 
+	});
+</script>
 </head>
 <body>
 

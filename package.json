@@ -1,0 +1,9 @@
+{
+  "name": "AggiePong",
+  "version": "0.0.1",
+  "description": "Like pong, but way more intense",
+  "dependencies": {
+    "express": "^4.10.2",
+    "socket.io": "^1.5.1"
+  }
+}
