@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="http://students.cse.tamu.edu/skoubya/AggiePong/Game.css" />
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body style="background-color:#500000;">
+
+<image src="http://students.cse.tamu.edu/skoubya/AggiePong/Images/startButtonSel.png" class='myButton' id='start' \>
+<image src="http://students.cse.tamu.edu/skoubya/AggiePong/Images/howToPlayButton.png" class='myButton' id='howToPlay' \>
+<image src="http://students.cse.tamu.edu/skoubya/AggiePong/Images/quitButton.png" class='myButton' id='quit' \>
+
+<script>
+	var selected = "start"
+	$(document).keydown(function(event){
+		var next;
+		var last;
+		if(event.which == 40){ //down
+			if(selected=="start"){
+				next = "#howToPlay";
+				last = "#start";
+				selected = "howToPlay";
+			}
+			else if(selected=="howToPlay"){
+				next = "#quit";
+				last = "#howToPlay";
+				selected = "quit";
+			}
+			else{
+				next = "#start";
+				last = "#quit";
+				selected = "start";
+			}
+			var src1 = $(next).attr("src").replace(".png", "Sel.png");
+			$(next).attr("src",src1);
+			var src2 = $(last).attr("src").replace("Sel.png", ".png");
+			$(last).attr("src", src2);
+		}
+		else if(event.which == 38){ //up
+			if(selected=="start"){
+				next = "#quit";
+				last = "#start";
+				selected = "quit";
+			}
+			else if(selected=="howToPlay"){
+				next = "#start";
+				last = "#howToPlay";
+				selected = "start";
+			}
+			else{
+				next = "#howToPlay";
+				last = "#quit";
+				selected = "howToPlay";
+			}
+			var src1 = $(next).attr("src").replace(".png", "Sel.png");
+			$(next).attr("src",src1);
+			var src2 = $(last).attr("src").replace("Sel.png", ".png");
+			$(last).attr("src", src2);
+		}
+		else if(event.which == 13){ //enter
+			if(selected=="start"){
+				$("head").append("<script type='text/javascript' src='http://students.cse.tamu.edu/skoubya/AggiePong/Game.js'>");
+				$("body").html("Game Goes Here");
+			}
+			else if(selected=="howToPlay"){
+				//switch to how to play
+			}
+			else{
+				//Not do-able
+				//TODO: Get another option
+			}
+		}
+	});
+</script>
+</body>
+</html>
