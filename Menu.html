@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="/static/Game.css" />
+<link rel="stylesheet" type="text/css" href="static/Game.css" />
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body style="background-color:#500000;">
 
-<image src="/static/Images/startButtonSel.png" class='myButton' id='start' \>
-<image src="/static//Images/howToPlayButton.png" class='myButton' id='howToPlay' \>
-<image src="/static/Images/quitButton.png" class='myButton' id='quit' \>
+<image src="static/Images/startButtonSel.png" class='myButton' id='start' \>
+<image src="static/Images/howToPlayButton.png" class='myButton' id='howToPlay' \>
+<image src="static/Images/quitButton.png" class='myButton' id='quit' \>
 
 <script>
 	var selected = "start"
@@ -60,7 +60,7 @@
 		}
 		else if(event.which == 13){ //enter
 			if(selected=="start"){
-				$("head").append("<script type='text/javascript' src='/static/Game.js'>");
+				$("head").append("<script type='text/javascript' src='static/Game.js'>");
 				$("body").html("Game Goes Here");
 			}
 			else if(selected=="howToPlay"){
