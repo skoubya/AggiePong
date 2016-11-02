@@ -5,7 +5,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
-<body style="background-color:#500000;">
+<body>
+
+<p id="message"></p>
 
 <image src="static/Images/startButtonSel.png" class='myButton' id='start' \>
 <image src="static/Images/howToPlayButton.png" class='myButton' id='howToPlay' \>
@@ -60,8 +62,17 @@
 		}
 		else if(event.which == 13){ //enter
 			if(selected=="start"){
-				$("head").append("<script type='text/javascript' src='static/Game.js'>");
-				$("body").html("Game Goes Here");
+				//$("head").append("<script type='text/javascript' src='static/Game.js'>");
+				$.get('static/Main.html', function(req, res){
+					//console.log(req);
+					var headReg = /<head>(.|\n|\r)*<\/head>/m;
+					$("head").html(req.match(headReg)[0]);
+					var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
+					$("body").html(req.match(bodyReg)[0]);
+				});
+				//$("head").load("static/Main.html #theHead");
+				//$("body").load("static/Main.html body");
+				//$("body").html("Game Goes Here");
 			}
 			else if(selected=="howToPlay"){
 				//switch to how to play

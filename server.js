@@ -15,13 +15,16 @@ var playerNum = 0;
 
 io.on('connection', function(socket){
 	if (playerNum >1){
-	socket.emit('full', "");
-	socket.disconnect();
+		socket.emit('full', "");
 	}
 	else{
 		socket.emit('playerId', playerNum);
-		playerNum++;
+		if(playerNum ==1){
+			io.sockets.emit('start', '');
+		}
 	}
+	
+	playerNum++;
 	
 	var leftDown = false;
 	var rightDown = false;
@@ -29,6 +32,10 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		playerNum--;
 		console.log("User Disconnected");
+		if(playerNum < 2) {
+			io.sockets.emit('quit', "");
+		}
+		//io.sockets.disconnect();
 	});
 	socket.on('keydown', function(msg){
 		if(msg.key == 39 && !leftDown && !rightDown){
