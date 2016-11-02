@@ -4,6 +4,8 @@
 <link rel="stylesheet" type="text/css" href="static/Game.css" />
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="static/Functions.js"></script>
+<script type="text/javascript" src="static/Menu.js"></script>
 </head>
 <body>
 
@@ -13,76 +15,5 @@
 <image src="static/Images/howToPlayButton.png" class='myButton' id='howToPlay' \>
 <image src="static/Images/quitButton.png" class='myButton' id='quit' \>
 
-<script>
-	var selected = "start"
-	$(document).keydown(function(event){
-		var next;
-		var last;
-		if(event.which == 40){ //down
-			if(selected=="start"){
-				next = "#howToPlay";
-				last = "#start";
-				selected = "howToPlay";
-			}
-			else if(selected=="howToPlay"){
-				next = "#quit";
-				last = "#howToPlay";
-				selected = "quit";
-			}
-			else{
-				next = "#start";
-				last = "#quit";
-				selected = "start";
-			}
-			var src1 = $(next).attr("src").replace(".png", "Sel.png");
-			$(next).attr("src",src1);
-			var src2 = $(last).attr("src").replace("Sel.png", ".png");
-			$(last).attr("src", src2);
-		}
-		else if(event.which == 38){ //up
-			if(selected=="start"){
-				next = "#quit";
-				last = "#start";
-				selected = "quit";
-			}
-			else if(selected=="howToPlay"){
-				next = "#start";
-				last = "#howToPlay";
-				selected = "start";
-			}
-			else{
-				next = "#howToPlay";
-				last = "#quit";
-				selected = "howToPlay";
-			}
-			var src1 = $(next).attr("src").replace(".png", "Sel.png");
-			$(next).attr("src",src1);
-			var src2 = $(last).attr("src").replace("Sel.png", ".png");
-			$(last).attr("src", src2);
-		}
-		else if(event.which == 13){ //enter
-			if(selected=="start"){
-				//$("head").append("<script type='text/javascript' src='static/Game.js'>");
-				$.get('static/Main.html', function(req, res){
-					//console.log(req);
-					var headReg = /<head>(.|\n|\r)*<\/head>/m;
-					$("head").html(req.match(headReg)[0]);
-					var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
-					$("body").html(req.match(bodyReg)[0]);
-				});
-				//$("head").load("static/Main.html #theHead");
-				//$("body").load("static/Main.html body");
-				//$("body").html("Game Goes Here");
-			}
-			else if(selected=="howToPlay"){
-				//switch to how to play
-			}
-			else{
-				//Not do-able
-				//TODO: Get another option
-			}
-		}
-	});
-</script>
 </body>
 </html>

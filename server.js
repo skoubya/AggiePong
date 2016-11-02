@@ -11,31 +11,31 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/Menu.html');
 });
 
-var playerNum = 0;
+var playerSockets = [];
 
 io.on('connection', function(socket){
-	if (playerNum >1){
+	if (playerSockets.length >1){
 		socket.emit('full', "");
 	}
 	else{
-		socket.emit('playerId', playerNum);
-		if(playerNum ==1){
+		playerSockets.push(socket);
+		socket.emit('playerId', playerSockets.length-1); //gives playes index
+		if(playerSockets.length == 2){
 			io.sockets.emit('start', '');
 		}
 	}
-	
-	playerNum++;
+
 	
 	var leftDown = false;
 	var rightDown = false;
 	console.log('A user connected');
 	socket.on('disconnect', function(){
-		playerNum--;
 		console.log("User Disconnected");
-		if(playerNum < 2) {
+		var playerInd = playerSockets.indexOf(socket);
+		if(playerInd != -1) {
+			playerSockets.splice(playerInd, 1);
 			io.sockets.emit('quit', "");
 		}
-		//io.sockets.disconnect();
 	});
 	socket.on('keydown', function(msg){
 		if(msg.key == 39 && !leftDown && !rightDown){
