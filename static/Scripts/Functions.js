@@ -1,5 +1,5 @@
 function showMessagePage(msg){
-	$.get('static/Intermediate.html', function(req, res){
+	$.get('static/Pages/Intermediate.html', function(req, res){
 				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 				$("body").html(req.match(bodyReg)[0]);
 				var headReg = /<head>(.|\n|\r)*<\/head>/m;

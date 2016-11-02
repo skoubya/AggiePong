@@ -47,12 +47,11 @@ $(document).keydown(function(event){
 	}
 	else if(event.which == 13){ //enter
 		if(selected=="start"){
-			$.get('static/Intermediate.html', function(req, res){
-				//console.log(req);
+			$.get('static/Pages/Intermediate.html', function(req, res){
 				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 				$("body").html(req.match(bodyReg)[0]);
 			});
-			$.get('static/Main.html', function(req, res){
+			$.get('static/Pages/Main.html', function(req, res){
 				var headReg = /<head>(.|\n|\r)*<\/head>/m;
 				$("head").html(req.match(headReg)[0]);
 			});

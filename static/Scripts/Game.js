@@ -30,7 +30,7 @@ $(document).keydown(function(event){
 
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
-	$.get('static/Main.html', function(req, res){
+	$.get('static/Pages/Main.html', function(req, res){
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
 	});
