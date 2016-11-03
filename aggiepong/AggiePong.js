@@ -19,6 +19,7 @@ var ball_direction = 1;
 function create() {
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.checkCollision.down = false;
 	
 	centerline = game.add.group();
 	centerline.enableBody = true;
@@ -35,13 +36,12 @@ function create() {
 	
 	paddle.body.collideWorldBounds = true;
 	paddle.body.immovable = true;
+	paddle.anchor.setTo(.5, .5);
 	
 	
 	balls = game.add.group();
 	balls.enableBody = true;
-	
-	//ball = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'ball');
-	//ball.anchor.set(0.5);
+
 	
 	game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
@@ -79,13 +79,13 @@ function render(){
 function ballHitPaddle(_paddle, _ball) {
 	
 	var diff = 0;
-	//_ball.body.velocity.y *= -1;
+	
 	
 	//ball is on left-hand side
 	if (_ball.x < _paddle.x){
 		
 		diff = _paddle.x - _ball.x;
-		_ball.body.velocity.x = (diff * -2);
+		_ball.body.velocity.x -= (diff);
 		
 	}
 	
@@ -93,7 +93,7 @@ function ballHitPaddle(_paddle, _ball) {
 	else if (_ball.x > _paddle.x){
 		
 		diff = _ball.x - _paddle.x;
-		_ball.body.velocity.x = (diff * 2);
+		_ball.body.velocity.x += (diff);
 		
 	}
 	//ball is perfectly in the middle
@@ -103,7 +103,7 @@ function ballHitPaddle(_paddle, _ball) {
 	
 }
 
-//************create ball function, and ball velocity
+//create ball function, and ball velocity
 function createBall() {
 	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
@@ -111,5 +111,6 @@ function createBall() {
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
+	ball.anchor.setTo(.5, .5);
 	ball_direction *= -1;
 }
