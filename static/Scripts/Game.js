@@ -30,10 +30,18 @@ $(document).keydown(function(event){
 
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
-	$.get('static/Pages/Main.html', function(req, res){
+	$.get('part1.html', function(req, res){
+		var headReg = /<head>(.|\n|\r)*<\/head>/m;
+		$("head").html(req.match(headReg)[0]);
+	});
+	$.get('part1.html', function(req, res){
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
 	});
+	/*$.get('static/Pages/Main.html', function(req, res){
+		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
+		$("body").html(req.match(bodyReg)[0]);
+	});*/
 	$(document).keydown(function(event){
 		socket.emit('keydown', {id: pid, key: event.which}); 
 	});
