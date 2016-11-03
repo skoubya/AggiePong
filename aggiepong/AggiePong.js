@@ -32,16 +32,13 @@ function create() {
 	}
 	
 	paddle = game.add.sprite(game.world.centerX - 60, 730, 'paddle');
-	//paddle.anchor.setTo()
-	
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
 	
 	paddle.body.collideWorldBounds = true;
-	paddle.body.bounce.set(1);
 	paddle.body.immovable = true;
 	
 	
-	balls = game.add.physicsGroup(Phaser.Physics.ARCADE);
+	balls = game.add.group();
 	balls.enableBody = true;
 	
 	//ball = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'ball');
@@ -54,7 +51,7 @@ function create() {
 	
 function update() {
 	
-	game.physics.arcade.collide(balls, paddle, ballHitPaddle, null, this);
+	game.physics.arcade.overlap(paddle, balls, ballHitPaddle, null, this);
 	paddle.body.velocity.x = 0;
 	paddle.body.velocity.y = 0;
 	
@@ -66,10 +63,10 @@ function update() {
 	}
 	
 	if(cursors.up.isDown){
-		paddle.body.bounce.set(1.2);
+	
 	}
 	if(!cursors.up.isDown){
-		paddle.body.bounce.set(1);
+		
 	}
 	
 }
@@ -79,15 +76,16 @@ function render(){
 }
 	
 
-function ballHitPaddle(_ball, _paddle) {
+function ballHitPaddle(_paddle, _ball) {
 	
 	var diff = 0;
+	_ball.body.velocity.y *= -1;
 	
 	//ball is on left-hand side
 	if (_ball.x < _paddle.x){
 		
 		diff = _paddle.x - _ball.x;
-		_ball.body.velocity.x = (diff * -10);
+		_ball.body.velocity.x = (diff * -2);
 		
 	}
 	
@@ -95,10 +93,10 @@ function ballHitPaddle(_ball, _paddle) {
 	else if (_ball.x > _paddle.x){
 		
 		diff = _ball.x - _paddle.x;
-		_ball.body.velocity.x = (diff * 10);
+		_ball.body.velocity.x = (diff * 2);
 		
 	}
-	//ball is perfectly in the middles
+	//ball is perfectly in the middle
 	else{
 		_ball.body.velocity.x = 2 + Math.random() * 6;
 	}
@@ -109,7 +107,7 @@ function ballHitPaddle(_ball, _paddle) {
 function createBall() {
 	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 300 + 400) * ball_direction);
+	ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
