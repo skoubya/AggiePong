@@ -47,13 +47,13 @@ $(document).keydown(function(event){
 	}
 	else if(event.which == 13){ //enter
 		if(selected=="start"){
-			$.get('static/Pages/Intermediate.html', function(req, res){
-				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
-				$("body").html(req.match(bodyReg)[0]);
-			});
-			$.get('static/Pages/Main.html', function(req, res){
+			$.get('part1.html', function(req, res){ //'static/Pages/Main.html'
 				var headReg = /<head>(.|\n|\r)*<\/head>/m;
 				$("head").html(req.match(headReg)[0]);
+			});
+			$.get('part1.html', function(req, res){ //'static/Pages/Intermediate.html'
+				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
+				$("body").html(req.match(bodyReg)[0]);
 			});
 		}
 		else if(selected=="howToPlay"){
