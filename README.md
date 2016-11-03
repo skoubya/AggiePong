@@ -2,11 +2,12 @@
 
 Main.html is curently unecessary
 
-To get your changes to the .js files to affect the main file:
+TO RUN:
 
-Host the files using this info: https://wiki.cse.tamu.edu/index.php/CSE_Web_Pages
+In terminal: run `node server.js` in AggiePong folder
 
-Then change "http://students.cse.tamu.edu/skoubya/AggiePong/..." to  "http://students.cse.tamu.edu/<yourusername>/<yourpath>/..." in Main.html.
+Open page "compute.cs.tamu.edu:10072" (or whatever port number you changed to in the server.js folder)
+
 
 I ran the file in "aggiepong" using wamp server:  
 1. install wamp, there are guides online  
