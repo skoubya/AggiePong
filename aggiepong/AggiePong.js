@@ -1,4 +1,3 @@
-
 var game = new Phaser.Game(600, 800, Phaser.AUTO, 'Aggie Pong', {preload: preload, create: create, update: update, render: render });
 
 function preload() {
@@ -51,7 +50,7 @@ function create() {
 	
 function update() {
 	
-	game.physics.arcade.overlap(paddle, balls, ballHitPaddle, null, this);
+	game.physics.arcade.collide(paddle, balls, ballHitPaddle, null, this);
 	paddle.body.velocity.x = 0;
 	paddle.body.velocity.y = 0;
 	
@@ -62,6 +61,7 @@ function update() {
 		paddle.body.velocity.x = 750;
 	}
 	
+	//impliment smacking the ball, increasing its velocity
 	if(cursors.up.isDown){
 	
 	}
@@ -79,7 +79,7 @@ function render(){
 function ballHitPaddle(_paddle, _ball) {
 	
 	var diff = 0;
-	_ball.body.velocity.y *= -1;
+	//_ball.body.velocity.y *= -1;
 	
 	//ball is on left-hand side
 	if (_ball.x < _paddle.x){
@@ -113,5 +113,3 @@ function createBall() {
 	ball.body.collideWorldBounds = true;
 	ball_direction *= -1;
 }
-
-
