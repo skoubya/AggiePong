@@ -13,6 +13,9 @@ var centerline;
 var balls;
 var paddle;
 var cursors;
+var counter = 0;
+var ball_direction = 1;
+
 
 function create() {
 	
@@ -38,24 +41,20 @@ function create() {
 	paddle.body.immovable = true;
 	
 	
-	balls = game.add.group();
+	balls = game.add.physicsGroup(Phaser.Physics.ARCADE);
 	balls.enableBody = true;
 	
-	ball = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'ball');
+	//ball = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'ball');
 	//ball.anchor.set(0.5);
-	ball.checkWorldBounds = true;
 	
-	game.physics.enable(ball, Phaser.Physics.ARCADE);
-	
-	ball.body.collideWorldBounds = true;
-	ball.body.bounce.set(1);
+	game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
 	cursors = game.input.keyboard.createCursorKeys();
 }
 	
 function update() {
 	
-	game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
+	game.physics.arcade.collide(balls, paddle, ballHitPaddle, null, this);
 	paddle.body.velocity.x = 0;
 	paddle.body.velocity.y = 0;
 	
@@ -72,8 +71,6 @@ function update() {
 	if(!cursors.up.isDown){
 		paddle.body.bounce.set(1);
 	}
-	
-	
 	
 }
 	
@@ -111,7 +108,12 @@ function ballHitPaddle(_ball, _paddle) {
 //************create ball function, and ball velocity
 function createBall() {
 	
-	
+	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
+	ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 300 + 400) * ball_direction);
+	ball.checkWorldBounds = true;
+	ball.body.bounce.set(1);
+	ball.body.collideWorldBounds = true;
+	ball_direction *= -1;
 }
 
 
