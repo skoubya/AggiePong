@@ -6,17 +6,29 @@ function preload() {
 	game.load.image('ball', 'assets/ball.png');
 	game.load.image('paddle', 'assets/paddle.png');
 	
+	game.load.bitmapFont('carrier', 'assets/carrier_command.png', 'assets/carrier_command.xml');
+	
 }
+
+//var textStyle = {font: '64px Carrier', align: 'center'};
 
 var centerline;
 var balls;
 var paddle;
 var cursors;
+
+var timer;
+var milliseconds = 0;
+var seconds = 0;
+var minutes = 0;
+
 var counter = 0;
 var ball_direction = 1;
 
 
 function create() {
+	
+	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
@@ -42,14 +54,15 @@ function create() {
 	balls = game.add.group();
 	balls.enableBody = true;
 
-	
 	game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
+	
 	
 	cursors = game.input.keyboard.createCursorKeys();
 }
 	
 function update() {
 	
+	updateTimer();
 	game.physics.arcade.collide(paddle, balls, ballHitPaddle, null, this);
 	paddle.body.velocity.x = 0;
 	paddle.body.velocity.y = 0;
@@ -113,4 +126,26 @@ function createBall() {
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
 	ball_direction *= -1;
+}
+
+
+function updateTimer() {
+	minutes = Math.floor(game.time.time / 60000) % 60;    
+	seconds = Math.floor(game.time.time / 1000) % 60;    
+	milliseconds = Math.floor(game.time.time) % 100;    
+	
+	//If any of the digits becomes a single digit number, pad it with a zero    
+	
+	if (milliseconds < 10){     
+		milliseconds = '0' + milliseconds;  
+	}
+	if (seconds < 10) {
+		seconds = '0' + seconds;  
+	}		
+	if (minutes < 10){       
+		minutes = '0' + minutes; 
+	}
+	
+	timer.setText(minutes + ':' + seconds + ':' + milliseconds);
+	
 }
