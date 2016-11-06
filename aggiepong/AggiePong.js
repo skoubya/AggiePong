@@ -15,6 +15,8 @@ function preload() {
 var centerline;
 var balls;
 var paddle;
+var player_1pts = 0;
+var player_2pts = 0;
 var cursors;
 
 var timer;
@@ -22,6 +24,7 @@ var milliseconds = 0;
 var seconds = 0;
 var minutes = 0;
 
+var score;
 var counter = 0;
 var ball_direction = 1;
 
@@ -29,6 +32,7 @@ var ball_direction = 1;
 function create() {
 	
 	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
+	score = game.add.bitmapText(32, 32, 'carrier', '0');
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
@@ -53,11 +57,15 @@ function create() {
 	
 	balls = game.add.group();
 	balls.enableBody = true;
+	balls.checkWorldBounds = true;
+	
 
 	game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
 	
+	
 	cursors = game.input.keyboard.createCursorKeys();
+	
 }
 	
 function update() {
@@ -85,7 +93,7 @@ function update() {
 }
 	
 function render(){
-	
+
 }
 	
 
@@ -125,6 +133,7 @@ function createBall() {
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
+	ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
 	ball_direction *= -1;
 }
 
@@ -147,5 +156,20 @@ function updateTimer() {
 	}
 	
 	timer.setText(minutes + ':' + seconds + ':' + milliseconds);
+	
+}
+
+function playerScored(_ball){
+	
+	if(_ball.y < 50){
+		player_2pts++;
+	}
+	else {
+		player_1pts++;
+	}
+	
+	score.setText('Score: ' + player_1pts + ' ' + player_2pts);
+	
+	_ball.kill();
 	
 }
