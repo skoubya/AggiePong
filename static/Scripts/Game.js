@@ -16,8 +16,6 @@ socket.on('quit', function(msg){
 		showMessagePage("The other player left :'( <br /> Game Over");
 	}
 	socket.disconnect();
-	//location.reload();
-	//some message
 });
 
 $(document).off(); //removes previous event handlers for document
@@ -30,11 +28,11 @@ $(document).keydown(function(event){
 
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
-	$.get('part1.html', function(req, res){
+	$.get('static/Pages/Game.html', function(req, res){
 		var headReg = /<head>(.|\n|\r)*<\/head>/m;
 		$("head").html(req.match(headReg)[0]);
 	});
-	$.get('part1.html', function(req, res){
+	$.get('static/Pages/Game.html', function(req, res){
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
 	});

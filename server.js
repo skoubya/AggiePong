@@ -6,7 +6,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.use('/static', express.static('static'));
-app.use('/', express.static('aggiepong')); //TODO: posibly change
+//app.use('/', express.static('aggiepong')); //TODO: posibly change
 
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/Menu.html');

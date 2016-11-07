@@ -2,11 +2,11 @@ var game = new Phaser.Game(600, 800, Phaser.AUTO, 'Aggie Pong', {preload: preloa
 
 function preload() {
 	
-	game.load.image('centerline', 'assets/centerline.png');
-	game.load.image('ball', 'assets/ball.png');
-	game.load.image('paddle', 'assets/paddle.png');
+	game.load.image('centerline', 'static/Images/centerline.png');
+	game.load.image('ball', 'static/Images/ball.png');
+	game.load.image('paddle', 'static/Images/paddle.png');
 	
-	game.load.bitmapFont('carrier', 'assets/carrier_command.png', 'assets/carrier_command.xml');
+	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
 
