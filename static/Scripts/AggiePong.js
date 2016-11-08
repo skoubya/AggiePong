@@ -1,4 +1,4 @@
-var game = new Phaser.Game(600, 800, Phaser.AUTO, 'game', {preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(600, 800, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render });
 
 function preload() {
 	
@@ -10,34 +10,24 @@ function preload() {
 	
 }
 
-//var textStyle = {font: '64px Carrier', align: 'center'};
-
 var centerline;
 var balls;
 var paddles;
-var player_1pts = 0;
-var player_2pts = 0;
 var cursors;
 
 var timer;
-//var milliseconds = 0;
-//var seconds = 0;
-//var minutes = 0;
-
 var score;
-var counter = 0;
-var ball_direction = 1;
 
+var counter = 0;
 
 function create() {
-	
 	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
 	score = game.add.bitmapText(32, 32, 'carrier', 'Score: 0 0');
-	
+		
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-	
+		
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -47,31 +37,29 @@ function create() {
 		//centerline.body.immovable = true;
 		
 	}
-	
+		
 	paddles =  game.add.group();
+		
 	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
 	
 	paddle.body.collideWorldBounds = true;
 	paddle.body.immovable = true;
 	paddle.anchor.setTo(.5, .5);
-	
+		
 	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
 	
 	paddle.body.collideWorldBounds = true;
 	paddle.body.immovable = true;
-	paddle.anchor.setTo(.5, .5);
-	
+	paddle.anchor.setTo(.5, .5);	
 	
 	balls = game.add.group();
 	balls.enableBody = true;
 	balls.checkWorldBounds = true;
-	
+		
 	createBall();
 	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
-	
-	
 	
 	cursors = game.input.keyboard.createCursorKeys();
 	
@@ -134,15 +122,11 @@ function ballHitPaddle(_paddle, _ball) {
 //create ball function, and ball velocity
 function createBall() {	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	//ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
 	//ball.body.velocity.setTo(0, 0);
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
-	//ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
-	ball_direction *= -1;
-	console.log(balls.children[0].position.x);
 }
 
 
@@ -167,21 +151,6 @@ function updateTimer() {
 	
 }
 
-function playerScored(_ball){
-	
-	if(_ball.y < 50){
-		player_2pts++;
-	}
-	else {
-		player_1pts++;
-	}
-	
-	score.setText('Score: ' + player_1pts + ' ' + player_2pts);
-	
-	//_ball.kill();
-	
-}
-
 socket.on('render', function(obj){
 	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
 	
@@ -197,11 +166,9 @@ socket.on('render', function(obj){
 });
 
 socket.on('score', function(obj){
-	/*var ball = balls.children[obj.ball.ind];
+	var ball = balls.children[obj.ball.ind];
 	ball.x = obj.ball.x;
-	ball.y = obj.ball.y;*/
-	balls.children[obj.ball.ind].x = obj.ball.x;
-	balls.children[obj.ball.ind].y = obj.ball.y;
+	ball.y = obj.ball.y;
 	
 	score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
 });
