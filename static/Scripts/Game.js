@@ -35,11 +35,14 @@ socket.on('start', function(msg){
 	$.get('static/Pages/Game.html', function(req, res){
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
+		if (pid == 0){
+			$("body").append('<script src=\"static/Scripts/MainClient.js\"></script>');
+		}
+		else{
+			$("body").append('<script src=\"static/Scripts/AggiePong.js\"></script>');
+		}
 	});
-	/*$.get('static/Pages/Main.html', function(req, res){
-		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
-		$("body").html(req.match(bodyReg)[0]);
-	});*/
+
 	$(document).keydown(function(event){
 		socket.emit('keydown', {id: pid, key: event.which}); 
 	});

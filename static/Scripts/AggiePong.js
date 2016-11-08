@@ -19,6 +19,7 @@ var timer;
 var score;
 
 var counter = 0;
+var ball_direction = 1;
 
 function create() {
 	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
@@ -67,90 +68,20 @@ function create() {
 	
 function update() {
 	
-	//updateTimer();
-	game.physics.arcade.collide(paddles, balls, ballHitPaddle, null, this);
-	paddles.children[0].body.velocity.x = 0;
-	paddles.children[0].body.velocity.y = 0;
-	
-	if(cursors.left.isDown && !cursors.right.isDown){
-		paddles.children[0].body.velocity.x = -750;
-	}
-	if(cursors.right.isDown && !cursors.left.isDown){
-		paddles.children[0].body.velocity.x = 750;
-	}
-	
-	//impliment smacking the ball, increasing its velocity
-	if(cursors.up.isDown){
-	
-	}
-	if(!cursors.up.isDown){
-		
-	}
 }
 	
 function render(){
 
 }
-	
-function ballHitPaddle(_paddle, _ball) {
-	
-	var diff = 0;
-	
-	
-	//ball is on left-hand side
-	if (_ball.x < _paddle.x){
-		
-		diff = _paddle.x - _ball.x;
-		_ball.body.velocity.x -= (diff);
-		
-	}
-	
-	//ball is on right-hand side
-	else if (_ball.x > _paddle.x){
-		
-		diff = _ball.x - _paddle.x;
-		_ball.body.velocity.x += (diff);
-		
-	}
-	//ball is perfectly in the middle
-	else{
-		_ball.body.velocity.x = 2 + Math.random() * 6;
-	}
-	
-}
 
-//create ball function, and ball velocity
 function createBall() {	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	//ball.body.velocity.setTo(0, 0);
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
 }
-
-
-function updateTimer() {
-	minutes = Math.floor(game.time.time / 60000) % 60;    
-	seconds = Math.floor(game.time.time / 1000) % 60;    
-	milliseconds = Math.floor(game.time.time) % 100;    
 	
-	//If any of the digits becomes a single digit number, pad it with a zero    
-	
-	if (milliseconds < 10){     
-		milliseconds = '0' + milliseconds;  
-	}
-	if (seconds < 10) {
-		seconds = '0' + seconds;  
-	}		
-	if (minutes < 10){       
-		minutes = '0' + minutes; 
-	}
-	
-	timer.setText(minutes + ':' + seconds + ':' + milliseconds);
-	
-}
-
 socket.on('render', function(obj){
 	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
 	
