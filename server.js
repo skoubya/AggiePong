@@ -39,6 +39,13 @@ io.on('connection', function(socket){
 		}
 	});
 	socket.on('keydown', function(msg){
+		var t = {min:2, sec:10, msec:12};
+		var b = [];
+		b[0] = {x:100, y:500};
+		var obj= {timer:t, balls:b};
+		io.sockets.emit('render', obj);
+		
+		
 		if(msg.key == 39 && !leftDown && !rightDown){
 			console.log("Player "+msg.id+" Moving Left");
 			leftDown = true;
