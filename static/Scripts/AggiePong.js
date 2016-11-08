@@ -132,16 +132,15 @@ function ballHitPaddle(_paddle, _ball) {
 }
 
 //create ball function, and ball velocity
-function createBall() {
-	
+function createBall() {	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
 	//ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
-	ball.body.velocity.setTo(0, 0);
+	//ball.body.velocity.setTo(0, 0);
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
-	ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
+	//ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
 	ball_direction *= -1;
 	console.log(balls.children[0].position.x);
 }
@@ -184,16 +183,25 @@ function playerScored(_ball){
 }
 
 socket.on('render', function(obj){
-	console.log(obj);
 	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
-	/*paddles.children[0].position.x = obj.player[0].x;
-	paddles.children[0].position.y = obj.player[0].y;
-	paddles.children[1].position.x = obj.player[1].x;
-	paddles.children[1].position.y = obj.player[1].y;*/
+	
+	paddles.children[0].position.x = obj.players[0].x;
+	paddles.children[0].position.y = obj.players[0].y;
+	paddles.children[1].position.x = obj.players[1].x;
+	paddles.children[1].position.y = obj.players[1].y;
 	
 	for(var i =0; i <obj.balls.length; i++){
 		balls.children[i].x = obj.balls[i].x;
 		balls.children[i].y = obj.balls[i].y;
 	}
+});
+
+socket.on('score', function(obj){
+	/*var ball = balls.children[obj.ball.ind];
+	ball.x = obj.ball.x;
+	ball.y = obj.ball.y;*/
+	balls.children[obj.ball.ind].x = obj.ball.x;
+	balls.children[obj.ball.ind].y = obj.ball.y;
 	
+	score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
 });

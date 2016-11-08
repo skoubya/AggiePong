@@ -39,18 +39,23 @@ io.on('connection', function(socket){
 		}
 	});
 	socket.on('keydown', function(msg){
-		var t = {min:2, sec:10, msec:12};
-		var b = [];
-		b[0] = {x:100, y:500};
-		var obj= {timer:t, balls:b};
-		io.sockets.emit('render', obj);
-		
-		
-		if(msg.key == 39 && !leftDown && !rightDown){
+		if(msg.key == 39 && !leftDown && !rightDown){//left
+			var obj = {ball:{ind:0, x:200, y:400}, p1Score:20, p2Score:18};
+			io.sockets.emit('score', obj);
+			
 			console.log("Player "+msg.id+" Moving Left");
 			leftDown = true;
 		}
-		if(msg.key == 37 && !leftDown && !rightDown){
+		if(msg.key == 37 && !leftDown && !rightDown){//right
+			var t = {min:2, sec:10, msec:12};
+			var b = [];
+			b[0] = {x:100, y:500};
+			var p = [];
+			p[0] = {x:200, y:720};
+			p[1] = {x:200, y:80};
+			var obj= {timer:t, balls:b, players:p};
+			io.sockets.emit('render', obj);
+			
 			console.log("Player "+msg.id+" Moving Right");
 			rightDown = true;
 		}
