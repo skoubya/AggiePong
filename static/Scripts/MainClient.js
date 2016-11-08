@@ -90,7 +90,7 @@ function create() {
 		}
 		var obj= {timer:t, balls:b, players:p};
 		socket.emit('render', obj);
-	}, 10);
+	}, 20);
 }
 	
 function update() {
@@ -198,21 +198,21 @@ function playerScored(_ball){
 }
 
 socket.on('keydown', function(msg){
-	if(msg.key == 39 && !leftDown[msg.id] && !rightDown[msg.id]){//left			
+	if(msg.key == 37 && !leftDown[msg.id] && !rightDown[msg.id]){//left			
 		console.log("Player "+msg.id+" Moving Left");
 		leftDown[msg.id] = true;
 	}
-	if(msg.key == 37 && !leftDown[msg.id] && !rightDown[msg.id]){//right			
+	if(msg.key == 39 && !leftDown[msg.id] && !rightDown[msg.id]){//right			
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
 });
 socket.on('keyup', function(msg){
-	if(msg.key == 39 && leftDown[msg.id]){
+	if(msg.key == 37 && leftDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Left");
 		leftDown[msg.id] = false;
 	}
-	if(msg.key == 37 && rightDown[msg.id]){
+	if(msg.key == 39 && rightDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Right");
 		rightDown[msg.id] = false;
 	}

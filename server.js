@@ -4,8 +4,6 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-//var phaser = require(__dirname + '/static/Scripts/phaser.min.js');
-//TODO: Phaser needs window which node.js doesn't have for server
 
 app.use('/static', express.static('static'));
 

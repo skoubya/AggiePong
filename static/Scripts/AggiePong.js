@@ -64,6 +64,28 @@ function create() {
 	
 	cursors = game.input.keyboard.createCursorKeys();
 	
+	socket.on('render', function(obj){
+		timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
+		
+		paddles.children[0].position.x = obj.players[0].x;
+		paddles.children[0].position.y = obj.players[0].y;
+		paddles.children[1].position.x = obj.players[1].x;
+		paddles.children[1].position.y = obj.players[1].y;
+		
+		for(var i =0; i <obj.balls.length; i++){
+			balls.children[i].x = obj.balls[i].x;
+			balls.children[i].y = obj.balls[i].y;
+		}
+	});
+
+	socket.on('score', function(obj){
+		var ball = balls.children[obj.ball.ind];
+		ball.x = obj.ball.x;
+		ball.y = obj.ball.y;
+		
+		score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
+	});
+	
 }
 	
 function update() {
@@ -81,25 +103,3 @@ function createBall() {
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
 }
-	
-socket.on('render', function(obj){
-	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
-	
-	paddles.children[0].position.x = obj.players[0].x;
-	paddles.children[0].position.y = obj.players[0].y;
-	paddles.children[1].position.x = obj.players[1].x;
-	paddles.children[1].position.y = obj.players[1].y;
-	
-	for(var i =0; i <obj.balls.length; i++){
-		balls.children[i].x = obj.balls[i].x;
-		balls.children[i].y = obj.balls[i].y;
-	}
-});
-
-socket.on('score', function(obj){
-	var ball = balls.children[obj.ball.ind];
-	ball.x = obj.ball.x;
-	ball.y = obj.ball.y;
-	
-	score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
-});
