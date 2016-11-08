@@ -30,7 +30,7 @@ socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
 	$.get('static/Pages/Game.html', function(req, res){
 		var headReg = /<head>(.|\n|\r)*<\/head>/m;
-		$("head").html(req.match(headReg)[0]);
+		$("head").append(req.match(headReg)[0]);
 	});
 	$.get('static/Pages/Game.html', function(req, res){
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;

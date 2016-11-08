@@ -1,4 +1,4 @@
-var game = new Phaser.Game(600, 800, Phaser.AUTO, 'Aggie Pong', {preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(600, 800, Phaser.AUTO, 'game', {preload: preload, create: create, update: update, render: render });
 
 function preload() {
 	
@@ -14,15 +14,15 @@ function preload() {
 
 var centerline;
 var balls;
-var paddle;
+var paddles;
 var player_1pts = 0;
 var player_2pts = 0;
 var cursors;
 
 var timer;
-var milliseconds = 0;
-var seconds = 0;
-var minutes = 0;
+//var milliseconds = 0;
+//var seconds = 0;
+//var minutes = 0;
 
 var score;
 var counter = 0;
@@ -32,10 +32,11 @@ var ball_direction = 1;
 function create() {
 	
 	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
-	score = game.add.bitmapText(32, 32, 'carrier', '0');
+	score = game.add.bitmapText(32, 32, 'carrier', 'Score: 0 0');
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
+	game.physics.arcade.checkCollision.up = false;
 	
 	centerline = game.add.group();
 	centerline.enableBody = true;
@@ -47,7 +48,15 @@ function create() {
 		
 	}
 	
-	paddle = game.add.sprite(game.world.centerX - 60, 730, 'paddle');
+	paddles =  game.add.group();
+	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
+	game.physics.enable(paddle, Phaser.Physics.ARCADE);
+	
+	paddle.body.collideWorldBounds = true;
+	paddle.body.immovable = true;
+	paddle.anchor.setTo(.5, .5);
+	
+	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
 	
 	paddle.body.collideWorldBounds = true;
@@ -59,8 +68,8 @@ function create() {
 	balls.enableBody = true;
 	balls.checkWorldBounds = true;
 	
-
-	game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
+	createBall();
+	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
 	
 	
@@ -70,16 +79,16 @@ function create() {
 	
 function update() {
 	
-	updateTimer();
-	game.physics.arcade.collide(paddle, balls, ballHitPaddle, null, this);
-	paddle.body.velocity.x = 0;
-	paddle.body.velocity.y = 0;
+	//updateTimer();
+	game.physics.arcade.collide(paddles, balls, ballHitPaddle, null, this);
+	paddles.children[0].body.velocity.x = 0;
+	paddles.children[0].body.velocity.y = 0;
 	
 	if(cursors.left.isDown && !cursors.right.isDown){
-		paddle.body.velocity.x = -750;
+		paddles.children[0].body.velocity.x = -750;
 	}
 	if(cursors.right.isDown && !cursors.left.isDown){
-		paddle.body.velocity.x = 750;
+		paddles.children[0].body.velocity.x = 750;
 	}
 	
 	//impliment smacking the ball, increasing its velocity
@@ -89,14 +98,12 @@ function update() {
 	if(!cursors.up.isDown){
 		
 	}
-	
 }
 	
 function render(){
 
 }
 	
-
 function ballHitPaddle(_paddle, _ball) {
 	
 	var diff = 0;
@@ -128,13 +135,15 @@ function ballHitPaddle(_paddle, _ball) {
 function createBall() {
 	
 	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+	//ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+	ball.body.velocity.setTo(0, 0);
 	ball.checkWorldBounds = true;
 	ball.body.bounce.set(1);
 	ball.body.collideWorldBounds = true;
 	ball.anchor.setTo(.5, .5);
 	ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
 	ball_direction *= -1;
+	console.log(balls.children[0].position.x);
 }
 
 
@@ -170,6 +179,21 @@ function playerScored(_ball){
 	
 	score.setText('Score: ' + player_1pts + ' ' + player_2pts);
 	
-	_ball.kill();
+	//_ball.kill();
 	
 }
+
+socket.on('render', function(obj){
+	console.log(obj);
+	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
+	/*paddles.children[0].position.x = obj.player[0].x;
+	paddles.children[0].position.y = obj.player[0].y;
+	paddles.children[1].position.x = obj.player[1].x;
+	paddles.children[1].position.y = obj.player[1].y;*/
+	
+	for(var i =0; i <obj.balls.length; i++){
+		balls.children[i].x = obj.balls[i].x;
+		balls.children[i].y = obj.balls[i].y;
+	}
+	
+});
