@@ -5,6 +5,7 @@ function preload() {
 	game.load.image('centerline', 'static/Images/centerline.png');
 	game.load.image('ball', 'static/Images/ball.png');
 	game.load.image('paddle', 'static/Images/paddle.png');
+	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
 	
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
@@ -16,6 +17,9 @@ var rightDown = [false, false];
 var game;
 var balls;
 var paddles;
+
+var invBalls;
+var invPaddles;
 
 var timer;
 var score;
@@ -54,24 +58,43 @@ function create() {
 	game.physics.arcade.checkCollision.up = false;
 	
 	paddles =  game.add.group();
+	invPaddles =  game.add.group();
+	
 	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	
 	paddle.body.collideWorldBounds = true;
 	paddle.body.immovable = true;
 	paddle.anchor.setTo(.5, .5);
+	
+	var invPaddle = invPaddles.create(game.world.centerX - 60, 730, 'inv_paddle');
+	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
+	invPaddle.body.collideWorldBounds = true;
+	invPaddle.body.immovable = true;
+	invPaddle.anchor.setTo(.5, .5);
+	//invPaddle.visible = false;
+	
 	
 	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
 	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	
 	paddle.body.collideWorldBounds = true;
 	paddle.body.immovable = true;
 	paddle.anchor.setTo(.5, .5);
+	
+	invPaddle = invPaddles.create(game.world.centerX - 60, 70, 'inv_paddle');
+	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
+	invPaddle.body.collideWorldBounds = true;
+	invPaddle.body.immovable = true;
+	invPaddle.anchor.setTo(.5, .5);
+	//invPaddle.visible = false;
 	
 	
 	balls = game.add.group();
 	balls.enableBody = true;
 	balls.checkWorldBounds = true;
+	
+	invBalls = game.add.group();
+	invBalls.enableBody = true;
+	invBalls.checkWorldBounds = true;
 	
 	createBall();
 	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
@@ -81,12 +104,12 @@ function create() {
 	setInterval(function(){
 		var t = {min:minutes, sec:seconds, msec:milliseconds};
 		var b = [];
-		for(var i =0; i < balls.children.length; i++){
-			b[i] = {x:balls.children[i].x, y:balls.children[i].y};
+		for(var i =0; i < invBalls.children.length; i++){
+			b[i] = {x:invBalls.children[i].x, y:invBalls.children[i].y};
 		}
 		var p = [];
-		for(var i =0; i < paddles.children.length; i++){
-			p[i] = {x:paddles.children[i].x, y:paddles.children[i].y};
+		for(var i =0; i < invPaddles.children.length; i++){
+			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y};
 		}
 		var obj= {timer:t, balls:b, players:p};
 		socket.emit('render', obj);
@@ -96,16 +119,16 @@ function create() {
 function update() {
 	
 	updateTimer();
-	game.physics.arcade.collide(paddles, balls, ballHitPaddle, null, this);
-	for (var i =0; i < paddles.children.length; i++){
-		paddles.children[i].body.velocity.x = 0;
-		paddles.children[i].body.velocity.y = 0;
+	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
+	for (var i =0; i < invPaddles.children.length; i++){
+		invPaddles.children[i].body.velocity.x = 0;
+		invPaddles.children[i].body.velocity.y = 0;
 		
 		if(leftDown[i] && !rightDown[i]){
-			paddles.children[i].body.velocity.x = -750;
+			invPaddles.children[i].body.velocity.x = -750;
 		}
 		if(rightDown[i] && !leftDown[i]){
-			paddles.children[i].body.velocity.x = 750;
+			invPaddles.children[i].body.velocity.x = 750;
 		}
 	}
 	
@@ -151,15 +174,17 @@ function ballHitPaddle(_paddle, _ball) {
 
 //create ball function, and ball velocity
 function createBall() {	
-	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
-	ball.checkWorldBounds = true;
-	ball.body.bounce.set(1);
-	ball.body.collideWorldBounds = true;
-	ball.anchor.setTo(.5, .5);
-	ball.events.onOutOfBounds.add(function(){playerScored(ball)}, this);
-	ball_direction *= -1;
-	console.log(balls.children[0].position.x);
+	var invBall = invBalls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
+	invBall.visibility =false;
+	ball = balls.create(invBall.x, invBall.y);
+	
+	invBall.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+	invBall.checkWorldBounds = true;
+	invBall.body.bounce.set(1);
+	invBall.body.collideWorldBounds = true;
+	invBall.anchor.setTo(.5, .5);
+	invBall.events.onOutOfBounds.add(function(){playerScored(invBall)}, this);
+	ball_direction *= -1;	
 }
 
 
@@ -193,7 +218,8 @@ function playerScored(_ball){
 	_ball.x = (Math.random() * 595);
 	_ball.y = game.world.centerY - 12;
 	_ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
-	var obj = {ball:{ind:balls.children.indexOf(_ball), x:_ball.x, y:_ball.y}, p1Score:player_1pts, p2Score:player_2pts};
+	ball_direction *= -1;
+	var obj = {ball:{ind:invBalls.children.indexOf(_ball), x:_ball.x, y:_ball.y}, p1Score:player_1pts, p2Score:player_2pts};
 	socket.emit('score', obj);
 }
 
