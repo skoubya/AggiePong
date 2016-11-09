@@ -5,6 +5,7 @@ function preload() {
 	game.load.image('centerline', 'static/Images/centerline.png');
 	game.load.image('ball', 'static/Images/ball.png');
 	game.load.image('paddle', 'static/Images/paddle.png');
+	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
 	
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
@@ -60,33 +61,9 @@ function create() {
 	paddles =  game.add.group();
 	invPaddles =  game.add.group();
 	
-	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
-	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	paddle.body.collideWorldBounds = true;
-	paddle.body.immovable = true;
-	paddle.anchor.setTo(.5, .5);
+	createPaddle(game.world.centerX - 60, 730);
 	
-	var invPaddle = invPaddles.create(game.world.centerX - 60, 730, 'inv_paddle');
-	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
-	invPaddle.body.collideWorldBounds = true;
-	invPaddle.body.immovable = true;
-	invPaddle.anchor.setTo(.5, .5);
-	//invPaddle.visible = false;
-	
-	
-	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
-	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	paddle.body.collideWorldBounds = true;
-	paddle.body.immovable = true;
-	paddle.anchor.setTo(.5, .5);
-	
-	invPaddle = invPaddles.create(game.world.centerX - 60, 70, 'inv_paddle');
-	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
-	invPaddle.body.collideWorldBounds = true;
-	invPaddle.body.immovable = true;
-	invPaddle.anchor.setTo(.5, .5);
-	//invPaddle.visible = false;
-	
+	createPaddle(game.world.centerX - 60, 70);
 	
 	balls = game.add.group();
 	balls.enableBody = true;
@@ -96,8 +73,8 @@ function create() {
 	invBalls.enableBody = true;
 	invBalls.checkWorldBounds = true;
 	
-	createBall();
-	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
+	//createBall();
+	game.time.events.repeat(Phaser.Timer.SECOND * 3, 4, createBall, this);
 	
 	cursors = game.input.keyboard.createCursorKeys();
 	
@@ -172,12 +149,25 @@ function ballHitPaddle(_paddle, _ball) {
 	
 }
 
+/* Creates a paddle in the specified location */
+function createPaddle(initX, initY){
+	var paddle = paddles.create(initX, initY, 'paddle');
+	game.physics.enable(paddle, Phaser.Physics.ARCADE);
+	paddle.body.collideWorldBounds = true;
+	paddle.body.immovable = true;
+	paddle.anchor.setTo(.5, .5);
+	
+	var invPaddle = invPaddles.create(initX, initY, 'inv_paddle');
+	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
+	invPaddle.body.collideWorldBounds = true;
+	invPaddle.body.immovable = true;
+	invPaddle.anchor.setTo(.5, .5);
+}
+
 //create ball function, and ball velocity
 function createBall() {	
-	var invBall = invBalls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	invBall.visibility =false;
-	ball = balls.create(invBall.x, invBall.y);
-	
+	//var ball = balls.create(invBall.x, invBall.y, 'ball');
+	var invBall = invBalls.create((Math.random() * 595), game.world.centerY - 12, 'inv_ball');
 	invBall.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
 	invBall.checkWorldBounds = true;
 	invBall.body.bounce.set(1);
@@ -215,20 +205,25 @@ function playerScored(_ball){
 		player_1pts++;
 	}
 	
-	_ball.x = (Math.random() * 595);
-	_ball.y = game.world.centerY - 12;
-	_ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
-	ball_direction *= -1;
-	var obj = {ball:{ind:invBalls.children.indexOf(_ball), x:_ball.x, y:_ball.y}, p1Score:player_1pts, p2Score:player_2pts};
+	var obj = {p1Score:player_1pts, p2Score:player_2pts};
 	socket.emit('score', obj);
+	
+	game.time.events.add(Phaser.Timer.SECOND, function(){ //wait a little before respawnning the ball
+		_ball.x = (Math.random() * 595);
+		_ball.y = game.world.centerY - 12;
+		_ball.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+		ball_direction *= -1;
+	}, this);
+	
+	
 }
 
 socket.on('keydown', function(msg){
-	if(msg.key == 37 && !leftDown[msg.id] && !rightDown[msg.id]){//left			
+	if(msg.key == 37 && !leftDown[msg.id]){//left			
 		console.log("Player "+msg.id+" Moving Left");
 		leftDown[msg.id] = true;
 	}
-	if(msg.key == 39 && !leftDown[msg.id] && !rightDown[msg.id]){//right			
+	if(msg.key == 39 && !rightDown[msg.id]){//right			
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
@@ -254,15 +249,17 @@ socket.on('render', function(obj){
 	paddles.children[1].position.y = obj.players[1].y;
 	
 	for(var i =0; i <obj.balls.length; i++){
-		balls.children[i].x = obj.balls[i].x;
-		balls.children[i].y = obj.balls[i].y;
+		if (i < balls.children.length) {
+			balls.children[i].x = obj.balls[i].x;
+			balls.children[i].y = obj.balls[i].y;
+		}
+		else{
+			var ball = balls.create(obj.balls[i].x, obj.balls[i].y, 'ball');
+			ball.anchor.setTo(.5, .5);
+		}
 	}
 });
 
 socket.on('score', function(obj){
-	var ball = balls.children[obj.ball.ind];
-	ball.x = obj.ball.x;
-	ball.y = obj.ball.y;
-	
 	score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
 });

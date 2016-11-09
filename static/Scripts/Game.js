@@ -31,8 +31,7 @@ socket.on('start', function(msg){
 	$.get('static/Pages/Game.html', function(req, res){
 		var headReg = /<head>(.|\n|\r)*<\/head>/m;
 		$("head").append(req.match(headReg)[0]);
-	});
-	$.get('static/Pages/Game.html', function(req, res){
+
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
 		if (pid == 0){

@@ -58,9 +58,6 @@ function create() {
 	balls = game.add.group();
 	balls.enableBody = true;
 	balls.checkWorldBounds = true;
-		
-	createBall();
-	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
 	cursors = game.input.keyboard.createCursorKeys();
 	
@@ -73,16 +70,18 @@ function create() {
 		paddles.children[1].position.y = obj.players[1].y;
 		
 		for(var i =0; i <obj.balls.length; i++){
-			balls.children[i].x = obj.balls[i].x;
-			balls.children[i].y = obj.balls[i].y;
+			if (i < balls.children.length) {
+				balls.children[i].x = obj.balls[i].x;
+				balls.children[i].y = obj.balls[i].y;
+			}
+			else{
+				var ball = balls.create(obj.balls[i].x, obj.balls[i].y, 'ball');
+				ball.anchor.setTo(.5, .5);
+			}
 		}
 	});
 
 	socket.on('score', function(obj){
-		var ball = balls.children[obj.ball.ind];
-		ball.x = obj.ball.x;
-		ball.y = obj.ball.y;
-		
 		score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
 	});
 	
@@ -94,12 +93,4 @@ function update() {
 	
 function render(){
 
-}
-
-function createBall() {	
-	var ball = balls.create((Math.random() * 595), game.world.centerY - 12, 'ball');
-	ball.checkWorldBounds = true;
-	ball.body.bounce.set(1);
-	ball.body.collideWorldBounds = true;
-	ball.anchor.setTo(.5, .5);
 }
