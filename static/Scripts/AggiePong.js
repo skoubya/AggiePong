@@ -8,6 +8,7 @@ function preload() {
 	game.load.image('square', 'static/Images/square.png');
 	game.load.image('square2', 'static/Images/square.png');	
 
+
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
@@ -32,7 +33,32 @@ function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-		
+	
+
+	square = game.add.sprite(700,game.world.centerY-117,'square');
+	game.physics.enable(square, Phaser.Physics.ARCADE);
+	square.body.collideWorldBounds = true;
+	square.body.checkCollision.up = true;
+	square.body.checkCollision.down = true;
+	square.body.checkCollision.right = true;
+	square.body.checkCollision.left = true;
+	square.body.bounce.setTo(1, 1);
+	square.body.velocity.x=200;
+	square.anchor.setTo(0.5,0.5);
+	square.body.immovable = true;
+
+	square2 = game.add.sprite(100,game.world.centerY+117,'square');
+	game.physics.enable(square2, Phaser.Physics.ARCADE);
+	square2.body.collideWorldBounds = true;
+	square2.body.checkCollision.up = true;
+	square2.body.checkCollision.down = true;
+	square2.body.checkCollision.right = true;
+	square2.body.checkCollision.left = true;
+	square2.body.bounce.setTo(1, 1);
+	square2.body.velocity.x=200;
+	square2.anchor.setTo(0.5,0.5);
+	square2.body.immovable = true;
+	
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -83,8 +109,10 @@ function create() {
 		
 		paddles.children[0].position.x = obj.players[0].x;
 		paddles.children[0].position.y = obj.players[0].y;
+		paddles.children[0].angle = obj.players[0].angle;
 		paddles.children[1].position.x = obj.players[1].x;
 		paddles.children[1].position.y = obj.players[1].y;
+		paddles.children[1].angle = obj.players[1].angle;
 		
 		for(var i =0; i <obj.balls.length; i++){
 			if (i < balls.children.length) {
@@ -108,7 +136,11 @@ function create() {
 	
 function update() {
 	square.angle++;
+<<<<<<< HEAD
 	//square2.angle++;
+=======
+	square2.angle++;
+>>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 }
 	
 function render(){

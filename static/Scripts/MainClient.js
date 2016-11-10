@@ -8,12 +8,18 @@ function preload() {
 	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
 	game.load.image('square', 'static/Images/square.png');
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
 
 var leftDown = [false, false];
 var rightDown = [false, false];
+var aDown = [false, false];
+var dDown = [false, false];
 
 var game;
 var balls;
@@ -46,6 +52,7 @@ function create() {
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
 	
+<<<<<<< HEAD
 	//************code for P2 physics*********** 
 /* 	game.physics.startSystem(Phaser.Physics.P2JS);
 	hex = game.add.sprite(300,game.world.centerY-117,'hex2'); 
@@ -53,6 +60,8 @@ function create() {
 	hex.body.clearShapes();
 	hex.body.loadPolygon('physicsData', 'hex2'); */
 
+=======
+>>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	square = game.add.sprite(700,game.world.centerY-117,'square');
 	game.physics.enable(square, Phaser.Physics.ARCADE);
 	square.body.collideWorldBounds = true;
@@ -65,7 +74,11 @@ function create() {
 	square.anchor.setTo(0.5,0.5);
 	square.body.immovable = true;
 
+<<<<<<< HEAD
 	square2 = game.add.sprite(100,game.world.centerY+117,'square2');
+=======
+	square2 = game.add.sprite(100,game.world.centerY+117,'square');
+>>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	game.physics.enable(square2, Phaser.Physics.ARCADE);
 	square2.body.collideWorldBounds = true;
 	square2.body.checkCollision.up = true;
@@ -76,7 +89,11 @@ function create() {
 	square2.body.velocity.x=200;
 	square2.anchor.setTo(0.5,0.5);
 	square2.body.immovable = true;
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -148,7 +165,7 @@ function create() {
 		}
 		var p = [];
 		for(var i =0; i < invPaddles.children.length; i++){
-			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y};
+			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y, angle:invPaddles.children[i].angle};
 		}
 		var s = {x:square.x, y:square.y, a:square.angle};
 		var s2 = {x:square2.x, y:square2.y, a:square2.angle};
@@ -159,10 +176,14 @@ function create() {
 	
 function update() {
 	square.angle++;
+
 	square2.angle++;
+
 	
 	updateTimer();
 	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
+	game.physics.arcade.collide(invBalls,square);
+	game.physics.arcade.collide(invBalls,square2);
 	for (var i =0; i < invPaddles.children.length; i++){
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
@@ -172,6 +193,12 @@ function update() {
 		}
 		if(rightDown[i] && !leftDown[i]){
 			invPaddles.children[i].body.velocity.x = 750;
+		}
+		if(aDown[i] && !dDown[i]){
+			invPaddles.children[i].angle++;
+		}
+		if(dDown[i] && !aDown[i]){
+			invPaddles.children[i].angle--;
 		}
 	}
 	
@@ -293,6 +320,14 @@ socket.on('keydown', function(msg){
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
+	if(msg.key == 65 && !aDown[msg.id]){
+		console.log("Player " + msg.id + " Tilting Left");
+		aDown[msg.id] = true;
+	}
+	if(msg.key == 68 && !dDown[msg.id]){
+		console.log("Player " + msg.id + " Tilting Right");
+		dDown[msg.id] = true;
+	}
 });
 socket.on('keyup', function(msg){
 	if(msg.key == 37 && leftDown[msg.id]){
@@ -303,6 +338,14 @@ socket.on('keyup', function(msg){
 		console.log("Player "+msg.id+" Stop Moving Right");
 		rightDown[msg.id] = false;
 	}
+	if(msg.key == 65 && aDown[msg.id]){
+		console.log("Player " + msg.id + " Stop Tilting Left");
+		aDown[msg.id] = false;
+	}
+	if(msg.key == 68 && dDown [msg.id]){
+		console.log("Player " + msg.id + " Stop Tilting Right");
+		dDown[msg.id] = false;
+	}
 });
 
 
@@ -312,9 +355,11 @@ socket.on('render', function(obj){
 	
 	paddles.children[0].position.x = obj.players[0].x;
 	paddles.children[0].position.y = obj.players[0].y;
+	paddles.children[0].angle = obj.players[0].angle;
 	paddles.children[1].position.x = obj.players[1].x;
 	paddles.children[1].position.y = obj.players[1].y;
-	
+	paddles.children[1].angle = obj.players[1].angle;	
+
 	for(var i =0; i <obj.balls.length; i++){
 		balls.children[i].x = obj.balls[i].x;
 		balls.children[i].y = obj.balls[i].y;
