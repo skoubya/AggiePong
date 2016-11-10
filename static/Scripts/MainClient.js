@@ -8,10 +8,8 @@ function preload() {
 	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
 	game.load.image('square', 'static/Images/square.png');
-<<<<<<< HEAD
-=======
-	
->>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
+	game.load.image('bomb', 'static/Images/bomb.png');
+
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
@@ -36,32 +34,31 @@ var score;
 var player_1pts = 0;
 var player_2pts = 0;
 
-var milliseconds = 0;
-var seconds = 0;
-var minutes = 0;
+var stunned = [false, false];
 
-var counter = 0;
+var milliseconds = '00';
+var seconds = '00';
+var minutes = '2';
+
+var sec_num = 0;
+var min_num = 2;
+
+var bomb;
 var ball_direction = 1;
 
 
 function create() {
-	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
-	score = game.add.bitmapText(32, 32, 'carrier', 'Score: 0 0');
+	timer = game.add.bitmapText(32, 800-32, 'carrier', '00:00');
+	score_1 = game.add.bitmapText(32, 16, 'carrier', 'Score: 0');
+	score_2 = game.add.bitmapText(600 - 200, 800 - 32, 'carrier', 'Score: 0');
+	score_1.scale.setTo(.5, .5);
+	score_2.scale.setTo(.5, .5);
+	timer.scale.setTo(.5, .5);
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-	
-<<<<<<< HEAD
-	//************code for P2 physics*********** 
-/* 	game.physics.startSystem(Phaser.Physics.P2JS);
-	hex = game.add.sprite(300,game.world.centerY-117,'hex2'); 
-	game.physics.p2.enable(hex, true);
-	hex.body.clearShapes();
-	hex.body.loadPolygon('physicsData', 'hex2'); */
 
-=======
->>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	square = game.add.sprite(700,game.world.centerY-117,'square');
 	game.physics.enable(square, Phaser.Physics.ARCADE);
 	square.body.collideWorldBounds = true;
@@ -74,11 +71,8 @@ function create() {
 	square.anchor.setTo(0.5,0.5);
 	square.body.immovable = true;
 
-<<<<<<< HEAD
-	square2 = game.add.sprite(100,game.world.centerY+117,'square2');
-=======
+
 	square2 = game.add.sprite(100,game.world.centerY+117,'square');
->>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	game.physics.enable(square2, Phaser.Physics.ARCADE);
 	square2.body.collideWorldBounds = true;
 	square2.body.checkCollision.up = true;
@@ -89,11 +83,7 @@ function create() {
 	square2.body.velocity.x=200;
 	square2.anchor.setTo(0.5,0.5);
 	square2.body.immovable = true;
-<<<<<<< HEAD
 
-=======
-	
->>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -111,37 +101,9 @@ function create() {
 	paddles =  game.add.group();
 	invPaddles =  game.add.group();
 	
+	createPaddle(game.world.centerX - 60, 730);
 	
-	
-	
-	
-	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
-	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	paddle.body.collideWorldBounds = true;
-	paddle.body.immovable = true;
-	paddle.anchor.setTo(.5, .5);
-	
-	var invPaddle = invPaddles.create(game.world.centerX - 60, 730, 'inv_paddle');
-	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
-	invPaddle.body.collideWorldBounds = true;
-	invPaddle.body.immovable = true;
-	invPaddle.anchor.setTo(.5, .5);
-	//invPaddle.visible = false;
-	
-	
-	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
-	game.physics.enable(paddle, Phaser.Physics.ARCADE);
-	paddle.body.collideWorldBounds = true;
-	paddle.body.immovable = true;
-	paddle.anchor.setTo(.5, .5);
-	
-	invPaddle = invPaddles.create(game.world.centerX - 60, 70, 'inv_paddle');
-	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
-	invPaddle.body.collideWorldBounds = true;
-	invPaddle.body.immovable = true;
-	invPaddle.anchor.setTo(.5, .5);
-	//invPaddle.visible = false;
-	
+	createPaddle(game.world.centerX - 60, 70);
 	
 	balls = game.add.group();
 	balls.enableBody = true;
@@ -151,11 +113,23 @@ function create() {
 	invBalls.enableBody = true;
 	invBalls.checkWorldBounds = true;
 	
-	createBall();
-	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
+	//creation of the bomb
+	game.time.events.add(Phaser.Timer.SECOND * 15, function(){
+		bomb = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'bomb');
+		game.physics.enable(bomb, Phaser.Physics.ARCADE);
+		bomb.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+		bomb.checkWorldBounds = true;
+		bomb.body.bounce.set(1);
+		bomb.body.collideWorldBounds = true;
+		bomb.anchor.setTo(.5, .5);
+		bomb.events.onOutOfBounds.add(function(){bombMissed(bomb)}, this);
+		ball_direction *= -1;
+	}, this);
+	
+	game.time.events.repeat(Phaser.Timer.SECOND * 3, 4, createBall, this);
+	game.time.events.repeat(Phaser.Timer.SECOND, 2000, updateTimer, this);
 	
 	cursors = game.input.keyboard.createCursorKeys();
-	
 	
 	setInterval(function(){
 		var t = {min:minutes, sec:seconds, msec:milliseconds};
@@ -169,35 +143,38 @@ function create() {
 		}
 		var s = {x:square.x, y:square.y, a:square.angle};
 		var s2 = {x:square2.x, y:square2.y, a:square2.angle};
-		var obj= {timer:t, balls:b, players:p, square:s, square2:s2};
+		var bo = (bomb == undefined) ? null : {x:bomb.x, y:bomb.y};
+		var obj= {timer:t, balls:b, players:p, square:s, square2:s2, bomb:bo};
 		socket.emit('render', obj);
 	}, 20);
 }
 	
 function update() {
 	square.angle++;
-
 	square2.angle++;
 
-	
-	updateTimer();
+	milliseconds = Math.floor(game.time.time) % 100;  
 	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
 	game.physics.arcade.collide(invBalls,square);
 	game.physics.arcade.collide(invBalls,square2);
+	game.physics.arcade.collide(invPaddles, bomb, ballHitPaddle, null, this);
+	game.physics.arcade.collide(bomb,square);
+	game.physics.arcade.collide(bomb,square2);
+	
 	for (var i =0; i < invPaddles.children.length; i++){
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
 		
-		if(leftDown[i] && !rightDown[i]){
+		if(leftDown[i] && !rightDown[i] && !stunned[i]){
 			invPaddles.children[i].body.velocity.x = -750;
 		}
-		if(rightDown[i] && !leftDown[i]){
+		if(rightDown[i] && !leftDown[i] && !stunned[i]){
 			invPaddles.children[i].body.velocity.x = 750;
 		}
-		if(aDown[i] && !dDown[i]){
+		if(aDown[i] && !dDown[i] && !stunned[i]){
 			invPaddles.children[i].angle++;
 		}
-		if(dDown[i] && !aDown[i]){
+		if(dDown[i] && !aDown[i] && !stunned[i]){
 			invPaddles.children[i].angle--;
 		}
 	}
@@ -272,20 +249,31 @@ function createBall() {
 
 
 function updateTimer() {
-	minutes = Math.floor(game.time.time / 60000) % 60;    
-	seconds = Math.floor(game.time.time / 1000) % 60;    
-	milliseconds = Math.floor(game.time.time) % 100;    
-	
+	sec_num--;  
 	//If any of the digits becomes a single digit number, pad it with a zero    
 	
-	if (milliseconds < 10){     
-		milliseconds = '0' + milliseconds;  
-	}
-	if (seconds < 10) {
-		seconds = '0' + seconds;  
+	if (sec_num < 0) {
+		sec_num = 59;
+		min_num--;
 	}		
-	if (minutes < 10){       
-		minutes = '0' + minutes; 
+	if (minutes < 0){   
+		if(player_1pts > player_2pts){
+			showMessagePage('Game Over\nPlayer 1 Wins!');
+		}
+		else if(player_1pts < player_2pts){
+			showMessagePage('Game Over\nPlayer 2 Wins!');
+		}
+		else{
+			showMessagePage('Game Over\nDraw');
+		}
+		
+	}
+	
+	seconds = sec_num.toString();
+	minutes = min_num.toString();
+	
+	if (sec_num < 10) {
+		seconds = '0' + seconds;
 	}
 }
 
@@ -309,6 +297,36 @@ function playerScored(_ball){
 	}, this);
 	
 	
+}
+
+//calls stunTimer(), creates another bomb 4 seconds later,
+function bombMissed(_bomb){
+	
+	if(_bomb.y < 50){
+		stunned[1] = true;
+		game.time.events.add(Phaser.Timer.SECOND * 2, this.stunTimer, this, 2);
+	}
+	else {
+		stunned[0] = true;
+		game.time.events.add(Phaser.Timer.SECOND * 2, this.stunTimer, this, 1);
+	}
+	
+	game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawnning the ball
+		_bomb.x = (Math.random() * 595);
+		_bomb.y = game.world.centerY - 12;
+		_bomb.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+		ball_direction *= -1;
+	}, this);
+}
+
+//removes the stun from the player
+function stunTimer(player){
+	if(player == 1){
+		stunned[0] = false;
+	}
+	else{
+		stunned[1] = false;
+	}
 }
 
 socket.on('keydown', function(msg){
@@ -350,8 +368,7 @@ socket.on('keyup', function(msg){
 
 
 socket.on('render', function(obj){
-	console.log(obj);
-	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
+	timer.setText('Time: ' + obj.timer.min + ':' + obj.timer.sec);
 	
 	paddles.children[0].position.x = obj.players[0].x;
 	paddles.children[0].position.y = obj.players[0].y;
@@ -361,8 +378,14 @@ socket.on('render', function(obj){
 	paddles.children[1].angle = obj.players[1].angle;	
 
 	for(var i =0; i <obj.balls.length; i++){
-		balls.children[i].x = obj.balls[i].x;
-		balls.children[i].y = obj.balls[i].y;
+		if (i < balls.children.length) {
+			balls.children[i].x = obj.balls[i].x;
+			balls.children[i].y = obj.balls[i].y;
+		}
+		else{
+			var ball = balls.create(obj.balls[i].x, obj.balls[i].y, 'ball');
+			ball.anchor.setTo(.5, .5);
+		}
 	}
 	square.x = obj.square.x;
 	square.y = obj.square.y;
@@ -374,5 +397,6 @@ socket.on('render', function(obj){
 });
 
 socket.on('score', function(obj){
-	score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
+	score_1.setText('Score: ' + obj.p1Score);
+	score_2.setText('Score: ' + obj.p2Score);
 });
