@@ -7,6 +7,7 @@ function preload() {
 	game.load.image('paddle', 'static/Images/paddle.png');
 	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
+	game.load.image('square', 'static/Images/square.png');
 	
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
@@ -43,7 +44,31 @@ function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-		
+	
+	square = game.add.sprite(700,game.world.centerY-117,'square');
+	game.physics.enable(square, Phaser.Physics.ARCADE);
+	square.body.collideWorldBounds = true;
+	square.body.checkCollision.up = true;
+	square.body.checkCollision.down = true;
+	square.body.checkCollision.right = true;
+	square.body.checkCollision.left = true;
+	square.body.bounce.setTo(1, 1);
+	square.body.velocity.x=200;
+	square.anchor.setTo(0.5,0.5);
+	square.body.immovable = true;
+
+	square2 = game.add.sprite(100,game.world.centerY+117,'square');
+	game.physics.enable(square2, Phaser.Physics.ARCADE);
+	square2.body.collideWorldBounds = true;
+	square2.body.checkCollision.up = true;
+	square2.body.checkCollision.down = true;
+	square2.body.checkCollision.right = true;
+	square2.body.checkCollision.left = true;
+	square2.body.bounce.setTo(1, 1);
+	square2.body.velocity.x=200;
+	square2.anchor.setTo(0.5,0.5);
+	square2.body.immovable = true;
+	
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -94,9 +119,13 @@ function create() {
 }
 	
 function update() {
+	square.angle++;
+	square2.angle++;		
 	
 	updateTimer();
 	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
+	game.physics.arcade.collide(invBalls,square);
+	game.physics.arcade.collide(invBalls,square2);
 	for (var i =0; i < invPaddles.children.length; i++){
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
