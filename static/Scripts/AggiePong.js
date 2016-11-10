@@ -5,7 +5,9 @@ function preload() {
 	game.load.image('centerline', 'static/Images/centerline.png');
 	game.load.image('ball', 'static/Images/ball.png');
 	game.load.image('paddle', 'static/Images/paddle.png');
-	
+	game.load.image('square', 'static/Images/square.png');
+	game.load.image('square2', 'static/Images/square.png');	
+
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
@@ -14,6 +16,8 @@ var centerline;
 var balls;
 var paddles;
 var cursors;
+var square;
+var square2;
 
 var timer;
 var score;
@@ -59,10 +63,23 @@ function create() {
 	balls.enableBody = true;
 	balls.checkWorldBounds = true;
 	
+	square = game.add.sprite(700,game.world.centerY-117,'square');
+	square.anchor.setTo(0.5,0.5);
+	square2 = game.add.sprite(100,game.world.centerY+117,'square');
+	square2.anchor.setTo(0.5,0.5);
+	
 	cursors = game.input.keyboard.createCursorKeys();
 	
 	socket.on('render', function(obj){
 		timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
+		
+		square.x = obj.square.x;
+		square.y = obj.square.y;
+		square.angle = obj.square.a;
+		
+		square2.x = obj.square2.x;
+		square2.y = obj.square2.y;
+		square2.angle = obj.square2.a;
 		
 		paddles.children[0].position.x = obj.players[0].x;
 		paddles.children[0].position.y = obj.players[0].y;
@@ -79,6 +96,8 @@ function create() {
 				ball.anchor.setTo(.5, .5);
 			}
 		}
+		
+		
 	});
 
 	socket.on('score', function(obj){
@@ -88,7 +107,8 @@ function create() {
 }
 	
 function update() {
-	
+	square.angle++;
+	//square2.angle++;
 }
 	
 function render(){
