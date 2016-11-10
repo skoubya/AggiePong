@@ -6,8 +6,7 @@ function preload() {
 	game.load.image('ball', 'static/Images/ball.png');
 	game.load.image('paddle', 'static/Images/paddle.png');
 	game.load.image('square', 'static/Images/square.png');
-	game.load.image('square2', 'static/Images/square.png');	
-
+	game.load.image('bomb', 'static/Images/bomb.png');
 
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
@@ -15,49 +14,27 @@ function preload() {
 
 var centerline;
 var balls;
+var bomb;
 var paddles;
 var cursors;
 var square;
 var square2;
 
 var timer;
-var score;
-
-var counter = 0;
-var ball_direction = 1;
+var score_1;
+var score_2;
 
 function create() {
-	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
-	score = game.add.bitmapText(32, 32, 'carrier', 'Score: 0 0');
+	timer = game.add.bitmapText(32, 800-32, 'carrier', '00:00:00');
+	score_1 = game.add.bitmapText(32, 16, 'carrier', 'Score: 0');
+	score_2 = game.add.bitmapText(600 - 200, 800 - 32, 'carrier', 'Score: 0');
+	score_1.scale.setTo(.5, .5);
+	score_2.scale.setTo(.5, .5);
+	timer.scale.setTo(.5, .5);
 		
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-	
-
-	square = game.add.sprite(700,game.world.centerY-117,'square');
-	game.physics.enable(square, Phaser.Physics.ARCADE);
-	square.body.collideWorldBounds = true;
-	square.body.checkCollision.up = true;
-	square.body.checkCollision.down = true;
-	square.body.checkCollision.right = true;
-	square.body.checkCollision.left = true;
-	square.body.bounce.setTo(1, 1);
-	square.body.velocity.x=200;
-	square.anchor.setTo(0.5,0.5);
-	square.body.immovable = true;
-
-	square2 = game.add.sprite(100,game.world.centerY+117,'square');
-	game.physics.enable(square2, Phaser.Physics.ARCADE);
-	square2.body.collideWorldBounds = true;
-	square2.body.checkCollision.up = true;
-	square2.body.checkCollision.down = true;
-	square2.body.checkCollision.right = true;
-	square2.body.checkCollision.left = true;
-	square2.body.bounce.setTo(1, 1);
-	square2.body.velocity.x=200;
-	square2.anchor.setTo(0.5,0.5);
-	square2.body.immovable = true;
 	
 	centerline = game.add.group();
 	centerline.enableBody = true;
@@ -97,7 +74,7 @@ function create() {
 	cursors = game.input.keyboard.createCursorKeys();
 	
 	socket.on('render', function(obj){
-		timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
+		timer.setText('Time: ' + obj.timer.min + ':' + obj.timer.sec);
 		
 		square.x = obj.square.x;
 		square.y = obj.square.y;
@@ -125,22 +102,26 @@ function create() {
 			}
 		}
 		
-		
+		if(obj.bomb != null){
+			if(bomb == undefined) {//don't have bomb
+				bomb = game.add.sprite(obj.bomb.x, obj.bomb.y, 'bomb');
+				bomb.anchor.setTo(.5, .5);
+			}
+			else{
+				bomb.x = obj.bomb.x;
+				bomb.y = obj.bomb.y;
+			}
+		}
 	});
 
 	socket.on('score', function(obj){
-		score.setText('Score: ' + obj.p1Score + ' ' + obj.p2Score);
+		score_1.setText('Score: ' + obj.p1Score);
+		score_2.setText('Score: ' + obj.p2Score);
 	});
 	
 }
 	
 function update() {
-	square.angle++;
-<<<<<<< HEAD
-	//square2.angle++;
-=======
-	square2.angle++;
->>>>>>> 051561fbb6e166c909b5f9d71a797f030be0528c
 }
 	
 function render(){
