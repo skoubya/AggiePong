@@ -7,7 +7,7 @@ function preload() {
 	game.load.image('paddle', 'static/Images/paddle.png');
 	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
-	
+	game.load.image('square', 'static/Images/square.png');
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
 }
@@ -18,6 +18,8 @@ var rightDown = [false, false];
 var game;
 var balls;
 var paddles;
+var square;
+var square2;
 
 var invBalls;
 var invPaddles;
@@ -39,11 +41,42 @@ var ball_direction = 1;
 function create() {
 	timer = game.add.bitmapText(250, 250, 'carrier', '00:00:00');
 	score = game.add.bitmapText(32, 32, 'carrier', 'Score: 0 0');
-		
+	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
-		
+	
+	//************code for P2 physics*********** 
+/* 	game.physics.startSystem(Phaser.Physics.P2JS);
+	hex = game.add.sprite(300,game.world.centerY-117,'hex2'); 
+	game.physics.p2.enable(hex, true);
+	hex.body.clearShapes();
+	hex.body.loadPolygon('physicsData', 'hex2'); */
+
+	square = game.add.sprite(700,game.world.centerY-117,'square');
+	game.physics.enable(square, Phaser.Physics.ARCADE);
+	square.body.collideWorldBounds = true;
+	square.body.checkCollision.up = true;
+	square.body.checkCollision.down = true;
+	square.body.checkCollision.right = true;
+	square.body.checkCollision.left = true;
+	square.body.bounce.setTo(1, 1);
+	square.body.velocity.x=200;
+	square.anchor.setTo(0.5,0.5);
+	square.body.immovable = true;
+
+	square2 = game.add.sprite(100,game.world.centerY+117,'square2');
+	game.physics.enable(square2, Phaser.Physics.ARCADE);
+	square2.body.collideWorldBounds = true;
+	square2.body.checkCollision.up = true;
+	square2.body.checkCollision.down = true;
+	square2.body.checkCollision.right = true;
+	square2.body.checkCollision.left = true;
+	square2.body.bounce.setTo(1, 1);
+	square2.body.velocity.x=200;
+	square2.anchor.setTo(0.5,0.5);
+	square2.body.immovable = true;
+
 	centerline = game.add.group();
 	centerline.enableBody = true;
 	
@@ -61,9 +94,37 @@ function create() {
 	paddles =  game.add.group();
 	invPaddles =  game.add.group();
 	
-	createPaddle(game.world.centerX - 60, 730);
 	
-	createPaddle(game.world.centerX - 60, 70);
+	
+	
+	
+	var paddle = paddles.create(game.world.centerX - 60, 730, 'paddle');
+	game.physics.enable(paddle, Phaser.Physics.ARCADE);
+	paddle.body.collideWorldBounds = true;
+	paddle.body.immovable = true;
+	paddle.anchor.setTo(.5, .5);
+	
+	var invPaddle = invPaddles.create(game.world.centerX - 60, 730, 'inv_paddle');
+	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
+	invPaddle.body.collideWorldBounds = true;
+	invPaddle.body.immovable = true;
+	invPaddle.anchor.setTo(.5, .5);
+	//invPaddle.visible = false;
+	
+	
+	paddle = paddles.create(game.world.centerX - 60, 70, 'paddle');
+	game.physics.enable(paddle, Phaser.Physics.ARCADE);
+	paddle.body.collideWorldBounds = true;
+	paddle.body.immovable = true;
+	paddle.anchor.setTo(.5, .5);
+	
+	invPaddle = invPaddles.create(game.world.centerX - 60, 70, 'inv_paddle');
+	game.physics.enable(invPaddle, Phaser.Physics.ARCADE);
+	invPaddle.body.collideWorldBounds = true;
+	invPaddle.body.immovable = true;
+	invPaddle.anchor.setTo(.5, .5);
+	//invPaddle.visible = false;
+	
 	
 	balls = game.add.group();
 	balls.enableBody = true;
@@ -73,10 +134,11 @@ function create() {
 	invBalls.enableBody = true;
 	invBalls.checkWorldBounds = true;
 	
-	//createBall();
-	game.time.events.repeat(Phaser.Timer.SECOND * 3, 4, createBall, this);
+	createBall();
+	//game.time.events.loop(Phaser.Timer.SECOND * 3, createBall, this);
 	
 	cursors = game.input.keyboard.createCursorKeys();
+	
 	
 	setInterval(function(){
 		var t = {min:minutes, sec:seconds, msec:milliseconds};
@@ -88,12 +150,16 @@ function create() {
 		for(var i =0; i < invPaddles.children.length; i++){
 			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y};
 		}
-		var obj= {timer:t, balls:b, players:p};
+		var s = {x:square.x, y:square.y, a:square.angle};
+		var s2 = {x:square2.x, y:square2.y, a:square2.angle};
+		var obj= {timer:t, balls:b, players:p, square:s, square2:s2};
 		socket.emit('render', obj);
 	}, 20);
 }
 	
 function update() {
+	square.angle++;
+	square2.angle++;
 	
 	updateTimer();
 	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
@@ -241,6 +307,7 @@ socket.on('keyup', function(msg){
 
 
 socket.on('render', function(obj){
+	console.log(obj);
 	timer.setText(obj.timer.min + ':' + obj.timer.sec + ':' + obj.timer.msec);
 	
 	paddles.children[0].position.x = obj.players[0].x;
@@ -249,15 +316,16 @@ socket.on('render', function(obj){
 	paddles.children[1].position.y = obj.players[1].y;
 	
 	for(var i =0; i <obj.balls.length; i++){
-		if (i < balls.children.length) {
-			balls.children[i].x = obj.balls[i].x;
-			balls.children[i].y = obj.balls[i].y;
-		}
-		else{
-			var ball = balls.create(obj.balls[i].x, obj.balls[i].y, 'ball');
-			ball.anchor.setTo(.5, .5);
-		}
+		balls.children[i].x = obj.balls[i].x;
+		balls.children[i].y = obj.balls[i].y;
 	}
+	square.x = obj.square.x;
+	square.y = obj.square.y;
+	square.angle = obj.square.a;
+	
+	square2.x = obj.square2.x;
+	square2.y = obj.square2.y;
+	square2.angle = obj.square2.a;
 });
 
 socket.on('score', function(obj){
