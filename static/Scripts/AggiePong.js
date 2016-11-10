@@ -93,8 +93,10 @@ function create() {
 		
 		paddles.children[0].position.x = obj.players[0].x;
 		paddles.children[0].position.y = obj.players[0].y;
+		paddles.children[0].angle = obj.players[0].angle;
 		paddles.children[1].position.x = obj.players[1].x;
 		paddles.children[1].position.y = obj.players[1].y;
+		paddles.children[1].angle = obj.players[1].angle;
 		
 		for(var i =0; i <obj.balls.length; i++){
 			if (i < balls.children.length) {

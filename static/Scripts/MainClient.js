@@ -15,6 +15,8 @@ function preload() {
 
 var leftDown = [false, false];
 var rightDown = [false, false];
+var aDown = [false, false];
+var dDown = [false, false];
 
 var game;
 var balls;
@@ -111,7 +113,7 @@ function create() {
 		}
 		var p = [];
 		for(var i =0; i < invPaddles.children.length; i++){
-			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y};
+			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y, angle:invPaddles.children[i].angle};
 		}
 		var obj= {timer:t, balls:b, players:p};
 		socket.emit('render', obj);
@@ -135,6 +137,12 @@ function update() {
 		}
 		if(rightDown[i] && !leftDown[i]){
 			invPaddles.children[i].body.velocity.x = 750;
+		}
+		if(aDown[i] && !dDown[i]){
+			invPaddles.children[i].angle++;
+		}
+		if(dDown[i] && !aDown[i]){
+			invPaddles.children[i].angle--;
 		}
 	}
 	
@@ -256,6 +264,14 @@ socket.on('keydown', function(msg){
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
+	if(msg.key == 65 && !aDown[msg.id]){
+		console.log("Player " + msg.id + " Tilting Left");
+		aDown[msg.id] = true;
+	}
+	if(msg.key == 68 && !dDown[msg.id]){
+		console.log("Player " + msg.id + " Tilting Right");
+		dDown[msg.id] = true;
+	}
 });
 socket.on('keyup', function(msg){
 	if(msg.key == 37 && leftDown[msg.id]){
@@ -266,6 +282,14 @@ socket.on('keyup', function(msg){
 		console.log("Player "+msg.id+" Stop Moving Right");
 		rightDown[msg.id] = false;
 	}
+	if(msg.key == 65 && aDown[msg.id]){
+		console.log("Player " + msg.id + " Stop Tilting Left");
+		aDown[msg.id] = false;
+	}
+	if(msg.key == 68 && dDown [msg.id]){
+		console.log("Player " + msg.id + " Stop Tilting Right");
+		dDown[msg.id] = false;
+	}
 });
 
 
@@ -274,9 +298,11 @@ socket.on('render', function(obj){
 	
 	paddles.children[0].position.x = obj.players[0].x;
 	paddles.children[0].position.y = obj.players[0].y;
+	paddles.children[0].angle = obj.players[0].angle;
 	paddles.children[1].position.x = obj.players[1].x;
 	paddles.children[1].position.y = obj.players[1].y;
-	
+	paddles.children[1].angle = obj.players[1].angle;	
+
 	for(var i =0; i <obj.balls.length; i++){
 		if (i < balls.children.length) {
 			balls.children[i].x = obj.balls[i].x;
