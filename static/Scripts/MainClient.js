@@ -8,6 +8,7 @@ function preload() {
 	game.load.image('inv_ball', 'static/Images/invBall.png');
 	game.load.image('inv_paddle', 'static/Images/invPaddle.png');
 	game.load.image('square', 'static/Images/square.png');
+	game.load.image('inv_square', 'static/Images/invSquare.png');
 	game.load.image('bomb', 'static/Images/bomb.png');
 
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
@@ -59,30 +60,38 @@ function create() {
 	game.physics.arcade.checkCollision.down = false;
 	game.physics.arcade.checkCollision.up = false;
 
+	invSquare = game.add.sprite(700,game.world.centerY-117,'inv_square');
+	game.physics.enable(invSquare, Phaser.Physics.ARCADE);
+	invSquare.body.collideWorldBounds = true;
+	invSquare.body.checkCollision.up = true;
+	invSquare.body.checkCollision.down = true;
+	invSquare.body.checkCollision.right = true;
+	invSquare.body.checkCollision.left = true;
+	invSquare.body.bounce.setTo(1, 1);
+	invSquare.body.velocity.x=200;
+	invSquare.anchor.setTo(0.5,0.5);
+	invSquare.body.immovable = true;
+	
 	square = game.add.sprite(700,game.world.centerY-117,'square');
 	game.physics.enable(square, Phaser.Physics.ARCADE);
-	square.body.collideWorldBounds = true;
-	square.body.checkCollision.up = true;
-	square.body.checkCollision.down = true;
-	square.body.checkCollision.right = true;
-	square.body.checkCollision.left = true;
-	square.body.bounce.setTo(1, 1);
-	square.body.velocity.x=200;
 	square.anchor.setTo(0.5,0.5);
-	square.body.immovable = true;
 
 
-	square2 = game.add.sprite(100,game.world.centerY+117,'square');
+	invSquare2 = game.add.sprite(100,game.world.centerY+117,'inv_square');
+	game.physics.enable(invSquare2, Phaser.Physics.ARCADE);
+	invSquare2.body.collideWorldBounds = true;
+	invSquare2.body.checkCollision.up = true;
+	invSquare2.body.checkCollision.down = true;
+	invSquare2.body.checkCollision.right = true;
+	invSquare2.body.checkCollision.left = true;
+	invSquare2.body.bounce.setTo(1, 1);
+	invSquare2.body.velocity.x=200;
+	invSquare2.anchor.setTo(0.5,0.5);
+	invSquare2.body.immovable = true;
+	
+	square2 = game.add.sprite(700,game.world.centerY-117,'square');
 	game.physics.enable(square2, Phaser.Physics.ARCADE);
-	square2.body.collideWorldBounds = true;
-	square2.body.checkCollision.up = true;
-	square2.body.checkCollision.down = true;
-	square2.body.checkCollision.right = true;
-	square2.body.checkCollision.left = true;
-	square2.body.bounce.setTo(1, 1);
-	square2.body.velocity.x=200;
 	square2.anchor.setTo(0.5,0.5);
-	square2.body.immovable = true;
 
 	centerline = game.add.group();
 	centerline.enableBody = true;
@@ -141,8 +150,8 @@ function create() {
 		for(var i =0; i < invPaddles.children.length; i++){
 			p[i] = {x:invPaddles.children[i].x, y:invPaddles.children[i].y, angle:invPaddles.children[i].angle};
 		}
-		var s = {x:square.x, y:square.y, a:square.angle};
-		var s2 = {x:square2.x, y:square2.y, a:square2.angle};
+		var s = {x:invSquare.x, y:invSquare.y, a:invSquare.angle};
+		var s2 = {x:invSquare2.x, y:invSquare2.y, a:invSquare2.angle};
 		var bo = (bomb == undefined) ? null : {x:bomb.x, y:bomb.y};
 		var obj= {timer:t, balls:b, players:p, square:s, square2:s2, bomb:bo};
 		socket.emit('render', obj);
@@ -150,16 +159,16 @@ function create() {
 }
 	
 function update() {
-	square.angle++;
-	square2.angle++;
+	invSquare.angle++;
+	invSquare2.angle++;
 
 	milliseconds = Math.floor(game.time.time) % 100;  
 	game.physics.arcade.collide(invPaddles, invBalls, ballHitPaddle, null, this);
-	game.physics.arcade.collide(invBalls,square);
-	game.physics.arcade.collide(invBalls,square2);
+	game.physics.arcade.collide(invBalls,invSquare);
+	game.physics.arcade.collide(invBalls,invSquare2);
 	game.physics.arcade.collide(invPaddles, bomb, ballHitPaddle, null, this);
-	game.physics.arcade.collide(bomb,square);
-	game.physics.arcade.collide(bomb,square2);
+	game.physics.arcade.collide(bomb,invSquare);
+	game.physics.arcade.collide(bomb,invSquare2);
 	
 	for (var i =0; i < invPaddles.children.length; i++){
 		invPaddles.children[i].body.velocity.x = 0;
