@@ -10,13 +10,13 @@ $(document).keydown(function(event){
 			selected = "howToPlay";
 		}
 		else if(selected=="howToPlay"){
-			next = "#quit";
+			next = "#aboutUs";
 			last = "#howToPlay";
-			selected = "quit";
+			selected = "aboutUs";
 		}
 		else{
 			next = "#start";
-			last = "#quit";
+			last = "#aboutUs";
 			selected = "start";
 		}
 		var src1 = $(next).attr("src").replace(".png", "Sel.png");
@@ -61,8 +61,8 @@ $(document).keydown(function(event){
 			showMessagePage(howToPlay);
 		}
 		else{
-			//Not do-able
-			//TODO: Get another option
+			var aboutUs = "Our Team: somethingGood <br /><br />Team Members: <br />Garrett Haynes <br />Nick Jackson <br />Aaron Skouby <br />Luke Sloniger";
+			showMessagePage(aboutUs);
 		}
 	}
 });
