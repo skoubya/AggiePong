@@ -51,6 +51,9 @@ io.on('connection', function(socket){
 	socket.on('score', function(obj){
 		io.sockets.emit('score', obj);
 	});
+	socket.on('endGame', function(obj){
+		io.sockets.emit('endGame', obj);
+	});
 });
 
 http.listen(socketNum, function(){

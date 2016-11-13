@@ -49,3 +49,15 @@ socket.on('start', function(msg){
 		socket.emit('keyup', {id: pid, key: event.which}); 
 	});
 });
+
+socket.on('endGame', function(obj){
+	if(obj.score1 == obj.score2){
+		showMessagePage('Game Over<br />Draw');
+	}
+	else if((obj.score1 > obj.score2 && pid == 0) || (obj.score1 < obj.score2 && pid == 1)){
+		showMessagePage('Game Over<br />You win');
+	}
+	else{
+		showMessagePage('Game Over<br />You lose');
+	}
+});

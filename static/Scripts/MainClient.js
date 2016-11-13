@@ -266,16 +266,9 @@ function updateTimer() {
 		min_num--;
 	}		
 	if (minutes < 0){   
-		if(player_1pts > player_2pts){
-			showMessagePage('Game Over\nPlayer 1 Wins!');
-		}
-		else if(player_1pts < player_2pts){
-			showMessagePage('Game Over\nPlayer 2 Wins!');
-		}
-		else{
-			showMessagePage('Game Over\nDraw');
-		}
-		
+		var scores = {score1:player_1pts, score2:player_2pts};
+		socket.emit('endGame', scores);
+		game.destroy();
 	}
 	
 	seconds = sec_num.toString();
