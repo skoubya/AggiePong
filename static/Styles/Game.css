@@ -8,6 +8,13 @@ body{
 	font-size: 200%;
 	text-align: center;
 }
+#message>table{
+	display: inline;
+	text-align: right;
+}
+.left{
+	text-align: left;
+}
 .myButton{
 	display: block;
 	margin: auto;

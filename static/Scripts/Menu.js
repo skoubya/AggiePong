@@ -57,11 +57,11 @@ $(document).keydown(function(event){
 			});
 		}
 		else if(selected=="howToPlay"){
-			var howToPlay = "Instructions";
+			var howToPlay = "<u>How to Play</u><br />The purpose of this game is to protect your goal from having anything go into it.  If you let a ball past, the other player gets a point. If you stop a power-up ball from getting past (i.e. it hits your paddle), you get the power-up.  If you let a bomb past, you will be temporarily stunned. <br /><br /> <u>Keys</u><br /> <table><tr><th>Left arrow</th><th> - </th><th class='left'>move paddle left</th></tr><tr><th>Right arrow</th><th> - </th><th class='left'>move paddle right</th></tr><tr><th>\\\"A\\\" key</th><th> - </th><th class='left'>rotate counter-clockwise</th></tr><tr><th>\\\"D\\\" key</th><th> - </th><th class='left'>rotate clockwise</th></tr></table>";
 			showMessagePage(howToPlay);
 		}
 		else{
-			var aboutUs = "Our Team: somethingGood <br /><br />Team Members: <br />Garrett Haynes <br />Nick Jackson <br />Aaron Skouby <br />Luke Sloniger";
+			var aboutUs = "<u>Our Team</u><br /> somethingGood <br /><br /><u>Team Members</u> <br />Garrett Haynes <br />Nick Jackson <br />Aaron Skouby <br />Luke Sloniger";
 			showMessagePage(aboutUs);
 		}
 	}
