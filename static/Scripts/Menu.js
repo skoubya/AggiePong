@@ -61,7 +61,7 @@ $(document).keydown(function(event){
 			showMessagePage(howToPlay);
 		}
 		else{
-			var aboutUs = "<u>Our Team</u><br /> somethingGood <br /><br /><u>Team Members</u> <br />Garrett Haynes <br />Nick Jackson <br />Aaron Skouby <br />Luke Sloniger";
+			var aboutUs = "<u>Our Team</u><br /> somethingGood <br /><br /><u>Team Members</u> <br />Garrett Haynes <br />Nick Jackson <br />Aaron Skouby <br />Luke Sloniger <br /><br /><p style='font-size:65%'>Explosion animation by Ville Seppanen</p>";
 			showMessagePage(aboutUs);
 		}
 	}
