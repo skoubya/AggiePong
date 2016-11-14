@@ -26,9 +26,9 @@ $(document).keydown(function(event){
 	}
 	else if(event.which == 38){ //up
 		if(selected=="start"){
-			next = "#quit";
+			next = "#aboutUs";
 			last = "#start";
-			selected = "quit";
+			selected = "aboutUs";
 		}
 		else if(selected=="howToPlay"){
 			next = "#start";
@@ -37,7 +37,7 @@ $(document).keydown(function(event){
 		}
 		else{
 			next = "#howToPlay";
-			last = "#quit";
+			last = "#aboutUs";
 			selected = "howToPlay";
 		}
 		var src1 = $(next).attr("src").replace(".png", "Sel.png");

@@ -10,6 +10,8 @@ function preload() {
 	game.load.image('square', 'static/Images/square.png');
 	game.load.image('inv_square', 'static/Images/invSquare.png');
 	game.load.image('bomb', 'static/Images/bomb.png');
+	
+	game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
@@ -45,6 +47,8 @@ var sec_num = 0;
 var min_num = 2;
 
 var bomb;
+var explosion;
+var animate_explode;
 var ball_direction = 1;
 
 
@@ -302,6 +306,7 @@ function playerScored(_ball){
 }
 
 //calls stunTimer(), creates another bomb 4 seconds later,
+//also calls explode() for the explosion animation
 function bombMissed(_bomb){
 	
 	if(_bomb.y < 50){
@@ -312,6 +317,9 @@ function bombMissed(_bomb){
 		stunned[0] = true;
 		game.time.events.add(Phaser.Timer.SECOND * 2, this.stunTimer, this, 1);
 	}
+	
+	var obj = {x:_bomb.x, y:_bomb.y};
+	socket.emit('explode', obj);
 	
 	game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawnning the ball
 		_bomb.x = (Math.random() * 595);
@@ -330,6 +338,26 @@ function stunTimer(player){
 		stunned[1] = false;
 	}
 }
+
+//explosion animation 
+function explode(xpos, ypos) {
+	
+	if(ypos < 100){
+		ypos = ypos + 30;
+	}
+	else{
+		ypos = ypos - 30;
+	}
+	
+	explosion = game.add.sprite(xpos, ypos, 'explosion');
+	explosion.anchor.setTo(.5, .5);
+	explosion.scale.setTo(4.5, 2.9);
+	animate_explode = explosion.animations.add('explode');
+	animate_explode.play('explode', 28, true);
+	animate_explode.loop = false;
+	
+}
+
 
 socket.on('keydown', function(msg){
 	if(msg.key == 37 && !leftDown[msg.id]){//left			
@@ -401,4 +429,7 @@ socket.on('render', function(obj){
 socket.on('score', function(obj){
 	score_1.setText('Score: ' + obj.p1Score);
 	score_2.setText('Score: ' + obj.p2Score);
+});
+socket.on('explode', function(obj){
+	explode(obj.x, obj.y);
 });

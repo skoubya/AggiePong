@@ -7,6 +7,8 @@ function preload() {
 	game.load.image('paddle', 'static/Images/paddle.png');
 	game.load.image('square', 'static/Images/square.png');
 	game.load.image('bomb', 'static/Images/bomb.png');
+	
+	game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
 	game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');
 	
@@ -118,8 +120,31 @@ function create() {
 		score_1.setText('Score: ' + obj.p1Score);
 		score_2.setText('Score: ' + obj.p2Score);
 	});
+	socket.on('explode', function(obj){
+		explode(obj.x, obj.y);
+	});
 	
 }
+	
+//explosion animation 
+function explode(xpos, ypos) {
+	
+	if(ypos < 100){
+		ypos = ypos + 30;
+	}
+	else{
+		ypos = ypos - 30;
+	}
+	
+	explosion = game.add.sprite(xpos, ypos, 'explosion');
+	explosion.anchor.setTo(.5, .5);
+	explosion.scale.setTo(4.5, 2.9);
+	animate_explode = explosion.animations.add('explode');
+	animate_explode.play('explode', 28, true);
+	animate_explode.loop = false;
+	
+}
+
 	
 function update() {
 }
