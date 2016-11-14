@@ -34,11 +34,13 @@ socket.on('start', function(msg){
 
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
+		$("body").append('<script src=\"static/Scripts/VisualGame.js\"></script>');
 		if (pid == 0){
 			$("body").append('<script src=\"static/Scripts/MainClient.js\"></script>');
 		}
 		else{
-			$("body").append('<script src=\"static/Scripts/AggiePong.js\"></script>');
+			//$("body").append('<script src=\"static/Scripts/AggiePong.js\"></script>');
+			$("body").append('<script>var theGame = new VisualGame(); \n theGame.start();</script>');
 		}
 	});
 
