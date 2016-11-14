@@ -54,10 +54,10 @@ var ball_direction = 1;
 
 function create() {
 	timer = game.add.bitmapText(32, 800-32, 'carrier', '00:00');
-	score_1 = game.add.bitmapText(32, 16, 'carrier', 'Score: 0');
-	score_2 = game.add.bitmapText(600 - 200, 800 - 32, 'carrier', 'Score: 0');
-	score_1.scale.setTo(.5, .5);
+	score_2 = game.add.bitmapText(32, 16, 'carrier', 'Score: 0');
+	score_1 = game.add.bitmapText(600 - 200, 800 - 32, 'carrier', 'Score: 0');
 	score_2.scale.setTo(.5, .5);
+	score_1.scale.setTo(.5, .5);
 	timer.scale.setTo(.5, .5);
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -286,10 +286,10 @@ function updateTimer() {
 function playerScored(_ball){
 	
 	if(_ball.y < 50){
-		player_2pts++;
+		player_1pts++;
 	}
 	else {
-		player_1pts++;
+		player_2pts++;
 	}
 	
 	var obj = {p1Score:player_1pts, p2Score:player_2pts};

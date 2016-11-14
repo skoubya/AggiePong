@@ -51,13 +51,14 @@ socket.on('start', function(msg){
 });
 
 socket.on('endGame', function(obj){
+	var score = obj.score1 + "-" + obj.score2;
 	if(obj.score1 == obj.score2){
-		showMessagePage('Game Over<br />Draw');
+		showMessagePage('Game Over<br />Draw <br />'+score);
 	}
 	else if((obj.score1 > obj.score2 && pid == 0) || (obj.score1 < obj.score2 && pid == 1)){
-		showMessagePage('Game Over<br />You win');
+		showMessagePage('Game Over<br />You win <br />'+score);
 	}
 	else{
-		showMessagePage('Game Over<br />You lose');
+		showMessagePage('Game Over<br />You lose <br />'+score);
 	}
 });
