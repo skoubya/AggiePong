@@ -258,8 +258,8 @@ function bombMissed(_bomb){
 	socket.emit('explode', obj);
 	
 	game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawning the ball
-		_bomb.x = (Math.random() * 595);
-		_bomb.y = game.world.centerY - 12;
+		_bomb.body.x = (Math.random() * 595);
+		_bomb.body.y = game.world.centerY - 12;
 		_bomb.body.velocity.x = Math.random() * 200 - 100;
 		_bomb.body.velocity.y = (Math.random() * 200 + 400) * ball_direction;
 		ball_direction *= -1;
