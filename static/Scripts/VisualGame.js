@@ -69,7 +69,7 @@ function VisualGame(){
 			self.score_2.setText('Them: ' + ((pid==0)? obj.p2Score: obj.p1Score));
 		});
 		socket.on('explode', function(obj){
-			self.explode(obj.x, obj.y);
+			self.explode((pid==0)? obj.x: gameWidth-obj.x, (pid==0)? obj.y: gameHeight-obj.y);
 		});
 	};
 	
