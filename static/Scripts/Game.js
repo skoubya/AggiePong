@@ -25,6 +25,13 @@ $(document).keydown(function(event){
 			location.reload();
 		}
 });
+$(document).ready(function(){
+	$('.myButton').click(function(){
+		if (!started){
+			location.reload();
+		}
+	});
+});
 
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
