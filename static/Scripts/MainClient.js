@@ -142,6 +142,7 @@ function update() {
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
 		
+		//weird math to determine screen flip for player 2
 		if(leftDown[i] && !rightDown[i] && !stunned[i]){
 			if(invPaddles.children[i].body.x < 0)
 				invPaddles.children[i].body.velocity.x = 0;
@@ -154,11 +155,11 @@ function update() {
 			else
 				invPaddles.children[i].body.velocity.x = 1000;
 		}
-		if(aDown[i] && !dDown[i] && !stunned[i] && invPaddles.children[i].body.angle <= 35){
-			invPaddles.children[i].body.angle += 3;
-		}
-		if(dDown[i] && !aDown[i] && !stunned[i] && invPaddles.children[i].body.angle >= -35){
+		if(aDown[i] && !dDown[i] && !stunned[i] && invPaddles.children[i].body.angle >= -35){
 			invPaddles.children[i].body.angle -= 3;
+		}
+		if(dDown[i] && !aDown[i] && !stunned[i] && invPaddles.children[i].body.angle <= 35){
+			invPaddles.children[i].body.angle += 3;
 		}
 	}
 }
@@ -261,37 +262,64 @@ function stunTimer(player){
 }
 
 socket.on('keydown', function(msg){
-	if(msg.key == 37 && !leftDown[msg.id]){//left			
+	var selKey;
+	if(msg.key == 37){
+		selKey = (msg.id == 0)? "left": "right";
+	}else if (msg.key == 39){
+		selKey = (msg.id == 0)? "right": "left";
+	}
+	else if (msg.key == 65){
+		selKey = "tLeft";
+	}
+	else if (msg.key == 68){
+		selKey = "tRight";
+	}
+	
+	
+	if(selKey == "left" && !leftDown[msg.id]){//left			
 		console.log("Player "+msg.id+" Moving Left");
 		leftDown[msg.id] = true;
 	}
-	if(msg.key == 39 && !rightDown[msg.id]){//right			
+	if(selKey == "right" && !rightDown[msg.id]){//right			
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
-	if(msg.key == 65 && !aDown[msg.id]){
+	if(selKey == "tLeft" && !aDown[msg.id]){
 		console.log("Player " + msg.id + " Tilting Left");
 		aDown[msg.id] = true;
 	}
-	if(msg.key == 68 && !dDown[msg.id]){
+	if(selKey == "tRight" && !dDown[msg.id]){
 		console.log("Player " + msg.id + " Tilting Right");
 		dDown[msg.id] = true;
 	}
 });
 socket.on('keyup', function(msg){
-	if(msg.key == 37 && leftDown[msg.id]){
+	var selKey = "";
+	if(msg.key == 37){
+		selKey = (msg.id == 0)? "left": "right";
+	}else if (msg.key == 39){
+		selKey = (msg.id == 0)? "right": "left";
+	}
+	else if (msg.key == 65){
+		selKey = "tLeft";
+	}
+	else if (msg.key == 68){
+		selKey = "tRight";
+	}
+	
+	if(selKey == "left" && leftDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Left");
 		leftDown[msg.id] = false;
 	}
-	if(msg.key == 39 && rightDown[msg.id]){
+	if(selKey == "right" && rightDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Right");
 		rightDown[msg.id] = false;
 	}
-	if(msg.key == 65 && aDown[msg.id]){
+	if(selKey == "tLeft" && aDown[msg.id]){
 		console.log("Player " + msg.id + " Stop Tilting Left");
 		aDown[msg.id] = false;
 	}
-	if(msg.key == 68 && dDown [msg.id]){
+	if(selKey == "tRight" && dDown [msg.id]){
 		console.log("Player " + msg.id + " Stop Tilting Right");
 		dDown[msg.id] = false;
 	}
