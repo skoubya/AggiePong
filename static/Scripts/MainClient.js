@@ -122,9 +122,54 @@ function create() {
 	game.time.events.repeat(Phaser.Timer.SECOND * 3, 4, createBall, this);
 	game.time.events.repeat(Phaser.Timer.SECOND, 2000, updateTimer, this);
 	
-	setInterval(renderEvent, 20);
+	setInterval(renderEvent, 10);
 }
-	
+
+
+function limitVelocity(sprite, maxVelocity) {
+  var body = sprite.body
+  var angle, currVelocitySqr, vx, vy;
+
+  vx = body.data.velocity[0];
+  vy = body.data.velocity[1];
+  
+  currVelocitySqr = vx * vx + vy * vy;
+  
+  if (currVelocitySqr > maxVelocity * maxVelocity) {
+    angle = Math.atan2(vy, vx);
+    
+    vx = Math.cos(angle) * maxVelocity;
+    vy = Math.sin(angle) * maxVelocity;
+    
+    body.data.velocity[0] = vx;
+    body.data.velocity[1] = vy;
+  }
+
+}
+
+function addVelocity(sprite, minVelocity) {
+  var body = sprite.body
+  var angle, currVelocitySqr, vx, vy;
+
+  vx = body.data.velocity[0];
+  vy = body.data.velocity[1];
+  
+  currVelocitySqr = vx * vx + vy * vy;
+  
+  if (currVelocitySqr < minVelocity * minVelocity) {
+    angle = Math.atan2(vy, vx);
+    
+    vx = Math.cos(angle) * maxVelocity;
+    vy = Math.sin(angle) * maxVelocity;
+    
+    body.data.velocity[0] = vx;
+    body.data.velocity[1] = vy;
+  }
+
+}
+
+var maxVelocity = 30;
+var minVelocity = 10;
 function update() {
 	for(var i = 0; i < invSquares.children.length; i++){
 		invSquares.children[i].body.angle++;
@@ -132,6 +177,8 @@ function update() {
 			invSquares.children[i].body.velocity.x *= -1;
 	}	
 	for(var i = 0; i < invBalls.children.length; i++){
+		limitVelocity(invBalls.children[i],maxVelocity);
+		addVelocity(invBalls.children[i],minVelocity);
 		if(invBalls.children[i].body.y < 0 || invBalls.children[i].body.y > 800)
 			playerScored(i);
 	}
@@ -161,7 +208,9 @@ function update() {
 			invPaddles.children[i].body.angle -= 3;
 		}
 	}
+	
 }
+
 
 //create ball function, and ball velocity
 function createBall() {	

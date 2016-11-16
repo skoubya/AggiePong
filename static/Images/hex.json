@@ -1,0 +1,21 @@
+{ 
+    
+    "hexagon_sm2": [
+        
+        {
+            "density": 2, "friction": 0, "bounce": 0, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   35, -0.5  ,  36, -0.5  ,  139.5, 50  ,  139.5, 54  ,  34, 104.5  ,  31.5, 101  ,  -0.5, 52  ]
+        } ,
+        {
+            "density": 2, "friction": 0, "bounce": 0, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   34, 104.5  ,  139.5, 54  ,  106.5, 104  ]
+        } ,
+        {
+            "density": 2, "friction": 0, "bounce": 0, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   139.5, 50  ,  36, -0.5  ,  106, -0.5  ]
+        }
+    ]
+}
