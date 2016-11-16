@@ -25,7 +25,8 @@ var bomb;
 //var animate_explode;
 
 var ball_direction = 1;
-var lockBall= [];
+var lockBall = [];
+var lockBomb;
 
 function renderEvent(){
 	var t = {min:minutes, sec:seconds, msec:milliseconds};
@@ -52,7 +53,7 @@ function createPaddle(init_x, init_y){
 	invPaddle.anchor.setTo(0.5, 0.5);
 	invPaddle.body.static = true;
 	invPaddle.body.setCollisionGroup(paddleCollisionGroup);
-	invPaddle.body.collides(ballCollisionGroup);
+	invPaddle.body.collides([ballCollisionGroup, bombCollisionGroup]);
 	invPaddle.body.collideWorldBounds = true;
 }
 
@@ -67,18 +68,19 @@ function createSquare(init_x, init_y){
 	invSquare.body.velocity.x = 200;
 	invSquare.body.static = true;
 	invSquare.body.setCollisionGroup(obsticleCollisionGroup);
-	invSquare.body.collides(ballCollisionGroup);
+	invSquare.body.collides([ballCollisionGroup, bombCollisionGroup]);
 }
 
 function createBomb(){
-	bomb = game.add.sprite((Math.random() * 595), game.world.centerY - 12, 'bomb');
-	game.physics.enable(bomb, Phaser.Physics.ARCADE);
-	bomb.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
-	bomb.checkWorldBounds = true;
-	bomb.body.bounce.set(1);
+	bomb = bombs.create((Math.random() * 595), game.world.centerY - 12, 'bomb');
+	bomb.body.setCircle(24);
+	bomb.anchor.setTo(0.5, 0.5);
+	bomb.body.setCollisionGroup(bombCollisionGroup);
+	bomb.body.collides([paddleCollisionGroup,  obsticleCollisionGroup]);
+	bomb.body.velocity.x = Math.random() * 200 - 100;
+	bomb.body.velocity.y = (Math.random() * 200 + 400) * ball_direction;
+	//bomb.events.onOutOfBounds.add(function(){bombMissed(bomb)}, this);
 	bomb.body.collideWorldBounds = true;
-	bomb.anchor.setTo(.5, .5);
-	bomb.events.onOutOfBounds.add(function(){bombMissed(bomb)}, this);
 	ball_direction *= -1;
 }
 
@@ -94,6 +96,7 @@ function create() {
 	game.physics.p2.gravity.x = 0;
 	paddleCollisionGroup = game.physics.p2.createCollisionGroup();
 	ballCollisionGroup = game.physics.p2.createCollisionGroup();
+	bombCollisionGroup = game.physics.p2.createCollisionGroup();
 	obsticleCollisionGroup = game.physics.p2.createCollisionGroup();	
 	
 	game.physics.p2.setBoundsToWorld(true, true, false, false, false);
@@ -109,6 +112,10 @@ function create() {
 	invBalls = game.add.group();
 	invBalls.enableBody = true;	
 	invBalls.physicsBodyType = Phaser.Physics.P2JS;
+	
+	bombs = game.add.group();
+	bombs.enableBody = true;	
+	bombs.physicsBodyType = Phaser.Physics.P2JS;
 	
 	invSquares = game.add.group();
 	invSquares.enableBody = true;
@@ -182,6 +189,12 @@ function update() {
 		if(invBalls.children[i].body.y < 0 || invBalls.children[i].body.y > 800)
 			playerScored(i);
 	}
+	for(var i = 0; i < bombs.children.length; i++){
+		if(bombs.children[i].body.y < 0 || bombs.children[i].body.y > 800){
+			bombMissed(bomb);
+		}
+	}
+	
 
 	milliseconds = Math.floor(game.time.time) % 100; 
 	
@@ -189,6 +202,7 @@ function update() {
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
 		
+		//weird math to determine screen flip for player 2
 		if(leftDown[i] && !rightDown[i] && !stunned[i]){
 			if(invPaddles.children[i].body.x < 0)
 				invPaddles.children[i].body.velocity.x = 0;
@@ -201,11 +215,11 @@ function update() {
 			else
 				invPaddles.children[i].body.velocity.x = 1000;
 		}
-		if(aDown[i] && !dDown[i] && !stunned[i] && invPaddles.children[i].body.angle <= 35){
-			invPaddles.children[i].body.angle += 3;
-		}
-		if(dDown[i] && !aDown[i] && !stunned[i] && invPaddles.children[i].body.angle >= -35){
+		if(aDown[i] && !dDown[i] && !stunned[i] && invPaddles.children[i].body.angle >= -35){
 			invPaddles.children[i].body.angle -= 3;
+		}
+		if(dDown[i] && !aDown[i] && !stunned[i] && invPaddles.children[i].body.angle <= 35){
+			invPaddles.children[i].body.angle += 3;
 		}
 	}
 	
@@ -220,9 +234,9 @@ function createBall() {
 	invBall.anchor.setTo(0.5, 0.5);
 	invBall.body.setCollisionGroup(ballCollisionGroup);
 	invBall.body.collides([paddleCollisionGroup,  obsticleCollisionGroup]);
-	invBall.body.velocity.x = 200
+	invBall.body.velocity.x = 200;
 	invBall.body.velocity.y = 200 * ball_direction;
-	invBall.events.onOutOfBounds.add(function(){playerScored(invBall)}, this);
+	//invBall.events.onOutOfBounds.add(function(){playerScored(invBall)}, this);
 	invBall.body.collideWorldBounds = true;
 	ball_direction *= -1;	
 }
@@ -278,7 +292,8 @@ function playerScored(i){
 //calls stunTimer(), creates another bomb 4 seconds later,
 //also calls explode() for the explosion animation
 function bombMissed(_bomb){
-	
+	if(lockBomb == true)	return;
+	lockBomb = true;
 	if(_bomb.y < 50){
 		stunned[1] = true;
 		game.time.events.add(Phaser.Timer.SECOND * 2, this.stunTimer, this, 2);
@@ -291,11 +306,13 @@ function bombMissed(_bomb){
 	var obj = {x:_bomb.x, y:_bomb.y};
 	socket.emit('explode', obj);
 	
-	game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawnning the ball
-		_bomb.x = (Math.random() * 595);
-		_bomb.y = game.world.centerY - 12;
-		_bomb.body.velocity.setTo(Math.random() * 200 - 100, (Math.random() * 200 + 400) * ball_direction);
+	game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawning the ball
+		_bomb.body.x = (Math.random() * 595);
+		_bomb.body.y = game.world.centerY - 12;
+		_bomb.body.velocity.x = Math.random() * 200 - 100;
+		_bomb.body.velocity.y = (Math.random() * 200 + 400) * ball_direction;
 		ball_direction *= -1;
+		lockBomb = false;
 	}, this);
 }
 
@@ -310,37 +327,64 @@ function stunTimer(player){
 }
 
 socket.on('keydown', function(msg){
-	if(msg.key == 37 && !leftDown[msg.id]){//left			
+	var selKey;
+	if(msg.key == 37){
+		selKey = (msg.id == 0)? "left": "right";
+	}else if (msg.key == 39){
+		selKey = (msg.id == 0)? "right": "left";
+	}
+	else if (msg.key == 65){
+		selKey = "tLeft";
+	}
+	else if (msg.key == 68){
+		selKey = "tRight";
+	}
+	
+	
+	if(selKey == "left" && !leftDown[msg.id]){//left			
 		console.log("Player "+msg.id+" Moving Left");
 		leftDown[msg.id] = true;
 	}
-	if(msg.key == 39 && !rightDown[msg.id]){//right			
+	if(selKey == "right" && !rightDown[msg.id]){//right			
 		console.log("Player "+msg.id+" Moving Right");
 		rightDown[msg.id] = true;
 	}
-	if(msg.key == 65 && !aDown[msg.id]){
+	if(selKey == "tLeft" && !aDown[msg.id]){
 		console.log("Player " + msg.id + " Tilting Left");
 		aDown[msg.id] = true;
 	}
-	if(msg.key == 68 && !dDown[msg.id]){
+	if(selKey == "tRight" && !dDown[msg.id]){
 		console.log("Player " + msg.id + " Tilting Right");
 		dDown[msg.id] = true;
 	}
 });
 socket.on('keyup', function(msg){
-	if(msg.key == 37 && leftDown[msg.id]){
+	var selKey = "";
+	if(msg.key == 37){
+		selKey = (msg.id == 0)? "left": "right";
+	}else if (msg.key == 39){
+		selKey = (msg.id == 0)? "right": "left";
+	}
+	else if (msg.key == 65){
+		selKey = "tLeft";
+	}
+	else if (msg.key == 68){
+		selKey = "tRight";
+	}
+	
+	if(selKey == "left" && leftDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Left");
 		leftDown[msg.id] = false;
 	}
-	if(msg.key == 39 && rightDown[msg.id]){
+	if(selKey == "right" && rightDown[msg.id]){
 		console.log("Player "+msg.id+" Stop Moving Right");
 		rightDown[msg.id] = false;
 	}
-	if(msg.key == 65 && aDown[msg.id]){
+	if(selKey == "tLeft" && aDown[msg.id]){
 		console.log("Player " + msg.id + " Stop Tilting Left");
 		aDown[msg.id] = false;
 	}
-	if(msg.key == 68 && dDown [msg.id]){
+	if(selKey == "tRight" && dDown [msg.id]){
 		console.log("Player " + msg.id + " Stop Tilting Right");
 		dDown[msg.id] = false;
 	}

@@ -1,5 +1,8 @@
 function VisualGame(){
 	var self = this;
+	var gameWidth = 600;
+	var gameHeight = 800; 
+	//take in pid???
 	/* Member Variables */
 	this.game = null;
 
@@ -16,7 +19,7 @@ function VisualGame(){
 
 	this.start = function(){
 		console.log("Start");
-		self.game = new Phaser.Game(600, 800, Phaser.AUTO, 'game', {preload: self.preload, create: self.create, update: null, render: null });
+		self.game = new Phaser.Game(gameWidth, gameHeight, Phaser.AUTO, 'game', {preload: self.preload, create: self.create, update: null, render: null });
 	};
 	
 	/* Starts listening for game events */
@@ -24,49 +27,49 @@ function VisualGame(){
 		socket.on('render', function(obj){
 			self.timer.setText('Time: ' + obj.timer.min + ':' + obj.timer.sec);
 			
-			self.paddles.children[0].x = obj.players[0].x;
-			self.paddles.children[0].y = obj.players[0].y;
+			self.paddles.children[0].x = (pid==0)? obj.players[0].x: gameWidth-obj.players[0].x;
+			self.paddles.children[0].y = (pid==0)? obj.players[0].y: gameHeight-obj.players[0].y;
 			self.paddles.children[0].angle = obj.players[0].angle;
-			self.paddles.children[1].x = obj.players[1].x;
-			self.paddles.children[1].y = obj.players[1].y;
-			self.paddles.children[1].angle = obj.players[1].angle;	
+			self.paddles.children[1].x = (pid==0)? obj.players[1].x: gameWidth-obj.players[1].x;
+			self.paddles.children[1].y = (pid==0)? obj.players[1].y: gameHeight-obj.players[1].y;
+			self.paddles.children[1].angle = obj.players[1].angle;
 
 			for(var i =0; i <obj.balls.length; i++){
 				if (i < self.balls.children.length) {
-					self.balls.children[i].x = obj.balls[i].x;
-					self.balls.children[i].y = obj.balls[i].y;
+					self.balls.children[i].x = (pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x;
+					self.balls.children[i].y = (pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y;
 				}
 				else{
-					var ball = self.balls.create(obj.balls[i].x, obj.balls[i].y, 'ball');
+					var ball = self.balls.create((pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x, (pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y, 'ball');
 					ball.anchor.setTo(.5, .5);
 				}
 			}
-			self.squares.children[0].x = obj.square.x;
-			self.squares.children[0].y = obj.square.y;
+			self.squares.children[0].x = (pid==0)? obj.square.x: gameWidth-obj.square.x;
+			self.squares.children[0].y = (pid==0)? obj.square.y: gameHeight-obj.square.y;
 			self.squares.children[0].angle = obj.square.a;
 			
-			self.squares.children[1].x = obj.square2.x;
-			self.squares.children[1].y = obj.square2.y;
+			self.squares.children[1].x = (pid==0)? obj.square2.x: gameWidth-obj.square2.x;
+			self.squares.children[1].y = (pid==0)? obj.square2.y: gameHeight-obj.square2.y;
 			self.squares.children[1].angle = obj.square2.a;
 			
 			if(obj.bomb != null){
 				if(self.bomb == undefined) {//don't have bomb
-					self.bomb = self.game.add.sprite(obj.bomb.x, obj.bomb.y, 'bomb');
+					self.bomb = self.game.add.sprite((pid==0)? obj.bomb.x: gameWidth-obj.bomb.x, (pid==0)? obj.bomb.y: gameHeight-obj.bomb.y, 'bomb');
 					self.bomb.anchor.setTo(.5, .5);
 				}
 				else{
-					self.bomb.x = obj.bomb.x;
-					self.bomb.y = obj.bomb.y;
+					self.bomb.x = (pid==0)? obj.bomb.x: gameWidth-obj.bomb.x;
+					self.bomb.y = (pid==0)? obj.bomb.y: gameHeight-obj.bomb.y;
 				}
 			}
 		});
 
 		socket.on('score', function(obj){
-			self.score_1.setText('Score: ' + obj.p1Score);
-			self.score_2.setText('Score: ' + obj.p2Score);
+			self.score_1.setText('You: ' + ((pid==0)? obj.p1Score: obj.p2Score));
+			self.score_2.setText('Them: ' + ((pid==0)? obj.p2Score: obj.p1Score));
 		});
 		socket.on('explode', function(obj){
-			self.explode(obj.x, obj.y);
+			self.explode((pid==0)? obj.x: gameWidth-obj.x, (pid==0)? obj.y: gameHeight-obj.y);
 		});
 	};
 	
@@ -85,11 +88,11 @@ function VisualGame(){
 
 	this.create = function(){
 		self.timer = self.game.add.bitmapText(32, 800-32, 'carrier', '00:00:00');
-		self.score_2 = self.game.add.bitmapText(32, 16, 'carrier', 'Score: 0');
-		self.score_1 = self.game.add.bitmapText(600 - 200, 800 - 32, 'carrier', 'Score: 0');
-		self.score_2.scale.setTo(.5, .5);
-		self.score_1.scale.setTo(.5, .5);
-		self.timer.scale.setTo(.5, .5);
+		self.score_1 = self.game.add.bitmapText(600 - 300, 800 - 32, 'carrier', 'You: 0');
+		self.score_2 = self.game.add.bitmapText(600 - 150, 800 - 32, 'carrier', 'Them: 0');
+		self.score_1.scale.setTo(.4, .4);
+		self.score_2.scale.setTo(.4, .4);
+		self.timer.scale.setTo(.4, .4);
 		
 		self.centerline = self.game.add.group();
 		self.centerline.enableBody = true;
