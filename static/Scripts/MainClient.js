@@ -51,7 +51,8 @@ function createPaddle(init_x, init_y){
 	var invPaddle = invPaddles.create(init_x, init_y, '');
 	invPaddle.body.setRectangle(160, 17);
 	invPaddle.anchor.setTo(0.5, 0.5);
-	invPaddle.body.static = true;
+	//invPaddle.body.static = true;
+	invPaddle.body.kinematic = true;
 	invPaddle.body.setCollisionGroup(paddleCollisionGroup);
 	invPaddle.body.collides([ballCollisionGroup, bombCollisionGroup]);
 	invPaddle.body.collideWorldBounds = true;
@@ -191,7 +192,7 @@ function update() {
 	}
 	for(var i = 0; i < bombs.children.length; i++){
 		if(bombs.children[i].body.y < 0 || bombs.children[i].body.y > 800){
-			bombMissed(bomb);
+			bombMissed(bombs.children[i]);
 		}
 	}
 	
@@ -202,17 +203,18 @@ function update() {
 		invPaddles.children[i].body.velocity.x = 0;
 		invPaddles.children[i].body.velocity.y = 0;
 		
+		var vertices = invPaddles.children[i].body.data.shapes[0].vertices;
+		// *20 is to get it in pixels
+		var maxX = invPaddles.children[i].body.x + Math.max(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])*20;
+		var minX = invPaddles.children[i].body.x + Math.min(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])*20;
+		
 		//weird math to determine screen flip for player 2
 		if(leftDown[i] && !rightDown[i] && !stunned[i]){
-			if(invPaddles.children[i].body.x < 0)
-				invPaddles.children[i].body.velocity.x = 0;
-			else
+			if(minX >= 0)
 				invPaddles.children[i].body.velocity.x = -1000;
 		}
 		if(rightDown[i] && !leftDown[i] && !stunned[i]){
-			if(invPaddles.children[i].body.x > 600)
-				invPaddles.children[i].body.velocity.x = 0;
-			else
+			if(maxX <= 600)
 				invPaddles.children[i].body.velocity.x = 1000;
 		}
 		if(aDown[i] && !dDown[i] && !stunned[i] && invPaddles.children[i].body.angle >= -35){
