@@ -4,16 +4,22 @@
  *
  */
 
+/* Data needed to set up the game */
 var socket = io();
 var pid = -1;
 var started = false;
+
+/* Recieve and set the player's ID */
 socket.on('playerId', function(id){
 	pid = id;
 });
+
+/* Display full message because 2 players already connected */
 socket.on('full', function(msg){
 	$("#message").html('Sorry two people are already playing. Come back later');
 });
 
+/* Display quit message */
 socket.on('quit', function(msg){
 	if(pid == -1){
 		showMessagePage("One of the players left <br /> Their Game Ended");
@@ -24,8 +30,10 @@ socket.on('quit', function(msg){
 	socket.disconnect();
 });
 
+
 $(document).off(); //removes previous event handlers for document
 
+/* On click or enter go back to main menu */
 $(document).keydown(function(event){
 		if(!started && event.which == 13){ //enter
 			location.reload();
@@ -39,6 +47,7 @@ $(document).ready(function(){
 	});
 });
 
+/* Starts the game */
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
 	$.get('static/Pages/Game.html', function(req, res){
@@ -64,6 +73,7 @@ socket.on('start', function(msg){
 	});
 });
 
+/* Ends the game */
 socket.on('endGame', function(obj){
 	var score = obj.score1 + "-" + obj.score2;
 	if(pid == -1){

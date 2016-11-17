@@ -4,10 +4,10 @@
  *
  */
 
- /* Puts specified message into the text section of the intermediate page 
-  * Parameters:
-  *		msg - string that will be displayed
-  */
+/* Puts specified message into the text section of the intermediate page 
+ * Parameters:
+ *		msg - string that will be displayed
+ */
 function showMessagePage(msg){
 	$.get('static/Pages/Intermediate.html', function(req, res){
 				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
