@@ -21,8 +21,6 @@ var sec_num = 0;
 var min_num = 2;
 
 var bomb;
-//var explosion;
-//var animate_explode;
 
 var ball_direction = 1;
 var lockBall = [];
@@ -51,7 +49,6 @@ function createPaddle(init_x, init_y){
 	var invPaddle = invPaddles.create(init_x, init_y, '');
 	invPaddle.body.setRectangle(160, 17);
 	invPaddle.anchor.setTo(0.5, 0.5);
-	//invPaddle.body.static = true;
 	invPaddle.body.kinematic = true;
 	invPaddle.body.setCollisionGroup(paddleCollisionGroup);
 	invPaddle.body.collides([ballCollisionGroup, bombCollisionGroup]);
@@ -80,15 +77,12 @@ function createBomb(){
 	bomb.body.collides([paddleCollisionGroup,  obsticleCollisionGroup]);
 	bomb.body.velocity.x = Math.random() * 200 - 100;
 	bomb.body.velocity.y = (Math.random() * 200 + 400) * ball_direction;
-	//bomb.events.onOutOfBounds.add(function(){bombMissed(bomb)}, this);
 	bomb.body.collideWorldBounds = true;
 	ball_direction *= -1;
 }
 
 function create() {
 	$("canvas").get(0).remove(); //removes image of extra canvas
-	var theGame = new VisualGame();
-	theGame.start();
 	
 	game.physics.startSystem(Phaser.Physics.P2JS);
 	game.physics.p2.setImpactEvents(true);
@@ -205,6 +199,7 @@ function update() {
 		
 		var vertices = invPaddles.children[i].body.data.shapes[0].vertices;
 		// *20 is to get it in pixels
+		// Determine farthes left and right points
 		var maxX = invPaddles.children[i].body.x + Math.max(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])*20;
 		var minX = invPaddles.children[i].body.x + Math.min(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])*20;
 		
@@ -230,7 +225,6 @@ function update() {
 
 //create ball function, and ball velocity
 function createBall() {	
-	//var ball = balls.create(invBall.x, invBall.y, 'ball');
 	var invBall = invBalls.create((Math.random() * 595), game.world.centerY - 12, '');
 	invBall.body.setCircle(24);
 	invBall.anchor.setTo(0.5, 0.5);
@@ -238,7 +232,6 @@ function createBall() {
 	invBall.body.collides([paddleCollisionGroup,  obsticleCollisionGroup]);
 	invBall.body.velocity.x = 200;
 	invBall.body.velocity.y = 200 * ball_direction;
-	//invBall.events.onOutOfBounds.add(function(){playerScored(invBall)}, this);
 	invBall.body.collideWorldBounds = true;
 	ball_direction *= -1;	
 }

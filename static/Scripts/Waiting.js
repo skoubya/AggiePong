@@ -1,3 +1,9 @@
+/* Client-side sockets
+ *
+ * Client-side socket set-up before the game starts and starts the game when needed
+ *
+ */
+
 var socket = io();
 var pid = -1;
 var started = false;
@@ -41,14 +47,13 @@ socket.on('start', function(msg){
 
 		var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 		$("body").html(req.match(bodyReg)[0]);
-		$("body").append('<script src=\"static/Scripts/VisualGame.js\"></script>');
+		
 		if (pid == 0){
 			$("body").append('<script src=\"static/Scripts/MainClient.js\"></script>');
 		}
-		else{
-			//$("body").append('<script src=\"static/Scripts/AggiePong.js\"></script>');
-			$("body").append('<script>var theGame = new VisualGame(); \n theGame.start();</script>');
-		}
+		
+		$("body").append('<script src=\"static/Scripts/VisualGame.js\"></script>');
+		$("body").append('<script>var theGame = new VisualGame('+ pid + '); \n theGame.start();</script>');
 	});
 
 	$(document).keydown(function(event){
@@ -61,7 +66,10 @@ socket.on('start', function(msg){
 
 socket.on('endGame', function(obj){
 	var score = obj.score1 + "-" + obj.score2;
-	if(obj.score1 == obj.score2){
+	if(pid == -1){
+		showMessagePage('Game Over<br />'+score);
+	}
+	else if(obj.score1 == obj.score2){
 		showMessagePage('Game Over<br />Draw <br />'+score);
 	}
 	else if((obj.score1 > obj.score2 && pid == 0) || (obj.score1 < obj.score2 && pid == 1)){
@@ -70,4 +78,5 @@ socket.on('endGame', function(obj){
 	else{
 		showMessagePage('Game Over<br />You lose <br />'+score);
 	}
+	socket.disconnect();
 });

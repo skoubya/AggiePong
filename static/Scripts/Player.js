@@ -1,3 +1,5 @@
+/* Not currently used */
+
 //TODO: make in namespace
 
 var PowerUp = {

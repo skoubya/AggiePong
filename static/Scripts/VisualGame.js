@@ -1,9 +1,10 @@
-function VisualGame(){
+function VisualGame(playerID){
 	var self = this;
 	var gameWidth = 600;
 	var gameHeight = 800; 
-	//take in pid???
+	
 	/* Member Variables */
+	this.pid = playerID;
 	this.game = null;
 
 	this.centerline = null;
@@ -18,7 +19,6 @@ function VisualGame(){
 	this.score_2 = null;
 
 	this.start = function(){
-		console.log("Start");
 		self.game = new Phaser.Game(gameWidth, gameHeight, Phaser.AUTO, 'game', {preload: self.preload, create: self.create, update: null, render: null });
 	};
 	
@@ -27,49 +27,49 @@ function VisualGame(){
 		socket.on('render', function(obj){
 			self.timer.setText('Time: ' + obj.timer.min + ':' + obj.timer.sec);
 			
-			self.paddles.children[0].x = (pid==0)? obj.players[0].x: gameWidth-obj.players[0].x;
-			self.paddles.children[0].y = (pid==0)? obj.players[0].y: gameHeight-obj.players[0].y;
+			self.paddles.children[0].x = (self.pid==0)? obj.players[0].x: gameWidth-obj.players[0].x;
+			self.paddles.children[0].y = (self.pid==0)? obj.players[0].y: gameHeight-obj.players[0].y;
 			self.paddles.children[0].angle = obj.players[0].angle;
-			self.paddles.children[1].x = (pid==0)? obj.players[1].x: gameWidth-obj.players[1].x;
-			self.paddles.children[1].y = (pid==0)? obj.players[1].y: gameHeight-obj.players[1].y;
+			self.paddles.children[1].x = (self.pid==0)? obj.players[1].x: gameWidth-obj.players[1].x;
+			self.paddles.children[1].y = (self.pid==0)? obj.players[1].y: gameHeight-obj.players[1].y;
 			self.paddles.children[1].angle = obj.players[1].angle;
 
 			for(var i =0; i <obj.balls.length; i++){
 				if (i < self.balls.children.length) {
-					self.balls.children[i].x = (pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x;
-					self.balls.children[i].y = (pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y;
+					self.balls.children[i].x = (self.pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x;
+					self.balls.children[i].y = (self.pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y;
 				}
 				else{
-					var ball = self.balls.create((pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x, (pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y, 'ball');
+					var ball = self.balls.create((self.pid==0)? obj.balls[i].x: gameWidth-obj.balls[i].x, (self.pid==0)? obj.balls[i].y: gameHeight-obj.balls[i].y, 'ball');
 					ball.anchor.setTo(.5, .5);
 				}
 			}
-			self.squares.children[0].x = (pid==0)? obj.square.x: gameWidth-obj.square.x;
-			self.squares.children[0].y = (pid==0)? obj.square.y: gameHeight-obj.square.y;
+			self.squares.children[0].x = (self.pid==0)? obj.square.x: gameWidth-obj.square.x;
+			self.squares.children[0].y = (self.pid==0)? obj.square.y: gameHeight-obj.square.y;
 			self.squares.children[0].angle = obj.square.a;
 			
-			self.squares.children[1].x = (pid==0)? obj.square2.x: gameWidth-obj.square2.x;
-			self.squares.children[1].y = (pid==0)? obj.square2.y: gameHeight-obj.square2.y;
+			self.squares.children[1].x = (self.pid==0)? obj.square2.x: gameWidth-obj.square2.x;
+			self.squares.children[1].y = (self.pid==0)? obj.square2.y: gameHeight-obj.square2.y;
 			self.squares.children[1].angle = obj.square2.a;
 			
 			if(obj.bomb != null){
 				if(self.bomb == undefined) {//don't have bomb
-					self.bomb = self.game.add.sprite((pid==0)? obj.bomb.x: gameWidth-obj.bomb.x, (pid==0)? obj.bomb.y: gameHeight-obj.bomb.y, 'bomb');
+					self.bomb = self.game.add.sprite((self.pid==0)? obj.bomb.x: gameWidth-obj.bomb.x, (self.pid==0)? obj.bomb.y: gameHeight-obj.bomb.y, 'bomb');
 					self.bomb.anchor.setTo(.5, .5);
 				}
 				else{
-					self.bomb.x = (pid==0)? obj.bomb.x: gameWidth-obj.bomb.x;
-					self.bomb.y = (pid==0)? obj.bomb.y: gameHeight-obj.bomb.y;
+					self.bomb.x = (self.pid==0)? obj.bomb.x: gameWidth-obj.bomb.x;
+					self.bomb.y = (self.pid==0)? obj.bomb.y: gameHeight-obj.bomb.y;
 				}
 			}
 		});
 
 		socket.on('score', function(obj){
-			self.score_1.setText('You: ' + ((pid==0)? obj.p1Score: obj.p2Score));
-			self.score_2.setText('Them: ' + ((pid==0)? obj.p2Score: obj.p1Score));
+			self.score_1.setText('You: ' + ((self.pid==0)? obj.p1Score: obj.p2Score));
+			self.score_2.setText('Them: ' + ((self.pid==0)? obj.p2Score: obj.p1Score));
 		});
 		socket.on('explode', function(obj){
-			self.explode((pid==0)? obj.x: gameWidth-obj.x, (pid==0)? obj.y: gameHeight-obj.y);
+			self.explode((self.pid==0)? obj.x: gameWidth-obj.x, (self.pid==0)? obj.y: gameHeight-obj.y);
 		});
 	};
 	
