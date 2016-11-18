@@ -1,12 +1,22 @@
+/* Menu
+ * 
+ * Navigates the game structure via the menu
+ *
+ */
+
 var selected = "start"
 
+/* Does the actions for the coresponding option 
+ * Parameters:
+ *		sel - string representing the option that is currently selected
+ */
 function choose(sel){
 	if(sel=="start"){
-			$.get('static/Pages/Main.html', function(req, res){ //'part1.html'
+			$.get('static/Pages/Main.html', function(req, res){ 
 				var headReg = /<head>(.|\n|\r)*<\/head>/m;
 				$("head").html(req.match(headReg)[0]);
 			});
-			$.get('static/Pages/Intermediate.html', function(req, res){ //'part1.html'
+			$.get('static/Pages/Intermediate.html', function(req, res){
 				var bodyReg = /<body>(.|\n|\r)*<\/body>/m;
 				$("body").html(req.match(bodyReg)[0]);
 			});
@@ -21,12 +31,14 @@ function choose(sel){
 		}
 }
 
+/* Make selection when clicked */
 $(document).ready(function(){
 	$('.myButton').click(function(){
 		choose($(this).attr('id'));
 	});
 });
 
+/* Change selection and make selection with enter */
 $(document).keydown(function(event){
 	var next;
 	var last;

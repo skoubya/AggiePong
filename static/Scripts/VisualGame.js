@@ -1,3 +1,9 @@
+/* Visual Game
+ * 
+ * The visual display of the game
+ *
+ */
+
 function VisualGame(playerID){
 	var self = this;
 	var gameWidth = 600;
@@ -119,7 +125,7 @@ function VisualGame(playerID){
 		self.startGameEvents();
 	};
 
-	//explosion animation 
+	/* Explosion animation */
 	this.explode = function(xpos, ypos){
 		if(ypos < 100){
 			ypos = ypos + 30;

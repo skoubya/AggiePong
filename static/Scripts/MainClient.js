@@ -358,8 +358,11 @@ function playerScored(ballInd){
 	}, this);
 }
 
-//calls stunTimer(), creates another bomb 4 seconds later,
-//also calls explode() for the explosion animation
+/* Calls stunTimer(), creates another bomb 4 seconds later,
+ * 		also calls explode() for the explosion animation
+ * Parameters:
+ *		_bomb - bomb that was missed
+ */
 function bombMissed(_bomb){
 	if(lockBomb == true)	return;
 	lockBomb = true;
@@ -385,7 +388,11 @@ function bombMissed(_bomb){
 	}, this);
 }
 
-//removes the stun from the player
+
+/* Unstuns the specified player
+ * Parameters:
+ *		player - player to be unstunned
+ */
 function stunTimer(player){
 	if(player == 1){
 		stunned[0] = false;
@@ -395,6 +402,7 @@ function stunTimer(player){
 	}
 }
 
+/* Handles the key events form the users */
 socket.on('keydown', function(msg){
 	var selKey;
 	if(msg.key == 37){
