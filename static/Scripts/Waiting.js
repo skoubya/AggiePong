@@ -9,6 +9,9 @@ var socket = io();
 var pid = -1;
 var started = false;
 
+var gameWidth = 600;
+var gameHeight = 800; 
+
 /* Recieve and set the player's ID */
 socket.on('playerId', function(id){
 	pid = id;
@@ -33,20 +36,6 @@ socket.on('quit', function(msg){
 
 $(document).off(); //removes previous event handlers for document
 
-/* On click or enter go back to main menu */
-$(document).keydown(function(event){
-		if(!started && event.which == 13){ //enter
-			location.reload();
-		}
-});
-$(document).ready(function(){
-	$('.myButton').click(function(){
-		if (!started){
-			location.reload();
-		}
-	});
-});
-
 /* Starts the game */
 socket.on('start', function(msg){
 	started = true; //stops enter from refreshing
@@ -59,10 +48,11 @@ socket.on('start', function(msg){
 		
 		if (pid == 0){
 			$("body").append('<script src=\"static/Scripts/MainClient.js\"></script>');
+			$("body").append('<script>var host = new MainClient('+ gameWidth +', '+gameHeight+'); \n host.start();</script>');
 		}
 		
 		$("body").append('<script src=\"static/Scripts/VisualGame.js\"></script>');
-		$("body").append('<script>var theGame = new VisualGame('+ pid + '); \n theGame.start();</script>');
+		$("body").append('<script>var theGame = new VisualGame('+ pid + ', ' + gameWidth +', '+gameHeight+'); \n theGame.start();</script>');
 	});
 
 	$(document).keydown(function(event){
