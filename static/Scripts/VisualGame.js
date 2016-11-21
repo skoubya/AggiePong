@@ -101,6 +101,8 @@ function VisualGame(playerID, gWidth, gHeight){
 		
 		self.game.load.audio('music', 'static/Sounds/251461__joshuaempyre__arcade-music-loop.wav');
 		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');
+		self.game.load.audio('countdown', 'static/Sounds/countdown_1.wav');
+		self.game.load.audio('go', 'static/Sounds/countdown_0.wav');
 		
 		self.game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
@@ -137,9 +139,10 @@ function VisualGame(playerID, gWidth, gHeight){
 		square2.anchor.setTo(0.5,0.5);
 		
 		self.explosionSound = self.game.add.audio('boom');
+		self.countdownSound = self.game.add.audio('countdown');
+		self.goSound = self.game.add.audio('go');
 		self.music = self.game.add.audio('music');
 		self.music.loop = true;
-		self.music.play();
 		
 		
 		self.cursors = self.game.input.keyboard.createCursorKeys();
@@ -157,11 +160,16 @@ function VisualGame(playerID, gWidth, gHeight){
 		var tween2 = self.game.add.tween(number).to({alpha: 0}, 300, Phaser.Easing.Linear.In);
 		tween1.chain(tween2);
 		if(self.countdownNum>0){
+			self.countdownSound.play();
 			self.countdownNum--;
 			tween2.onComplete.add(self.countdown, this);
 		}
+		else{
+			self.goSound.play();
+			self.game.time.events.add(500,function(){self.music.play()}, this);
+		}
 		tween1.start();
-
+		
 	}
 	
 
