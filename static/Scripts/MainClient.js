@@ -48,7 +48,7 @@ function MainClient(gWidth, gHeight){
 	this.lockBomb;
     
 	this.maxVelocity = 30;
-	this.minVelocity = 10;
+	this.minVelocity = 15;
 	
 	/* Create the Phaser game */
 	this.start = function(){
