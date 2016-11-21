@@ -20,6 +20,7 @@ function VisualGame(playerID, gWidth, gHeight){
 	this.paddles = null;
 	this.squares = null;
 	this.cursors = null;
+	this.powUp = null;
 
 	this.timer = null;
 	this.score_1 = null;
@@ -30,7 +31,8 @@ function VisualGame(playerID, gWidth, gHeight){
 
 	/* Creates the Phaser game */
 	this.start = function(){
-		self.game = new Phaser.Game(self.gameWidth, self.gameHeight, Phaser.AUTO, 'game', {preload: self.preload, create: self.create, update: null, render: null });
+		self.game = new Phaser.Game(self.gameWidth, self.gameHeight, Phaser.AUTO, 'game', 
+		{preload: self.preload, create: self.create, update: null, render: null });
 	};
 	
 	/* Starts listening for game events */
@@ -44,6 +46,7 @@ function VisualGame(playerID, gWidth, gHeight){
 			self.paddles.children[1].x = (self.pid==0)? obj.players[1].x: self.gameWidth-obj.players[1].x;
 			self.paddles.children[1].y = (self.pid==0)? obj.players[1].y: self.gameHeight-obj.players[1].y;
 			self.paddles.children[1].angle = obj.players[1].angle;
+			
 
 			for(var i =0; i <obj.balls.length; i++){
 				if (i < self.balls.children.length) {
@@ -73,6 +76,16 @@ function VisualGame(playerID, gWidth, gHeight){
 					self.bomb.y = (self.pid==0)? obj.bomb.y: self.gameHeight-obj.bomb.y;
 				}
 			}
+			if(obj.powUp != null){
+				if(self.powUp == undefined) {//don't have powUp
+					self.powUp = self.game.add.sprite((self.pid==0)? obj.powUp.x: self.gameWidth-obj.powUp.x, (self.pid==0)? obj.powUp.y: self.gameHeight-obj.powUp.y, 'powUp');
+					self.powUp.anchor.setTo(.5, .5);
+				}
+				else{
+					self.powUp.x = (self.pid==0)? obj.powUp.x: self.gameWidth-obj.powUp.x;
+					self.powUp.y = (self.pid==0)? obj.powUp.y: self.gameHeight-obj.powUp.y;
+				}
+			}
 		});
 
 		socket.on('score', function(obj){
@@ -91,6 +104,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.image('paddle', 'static/Images/paddle.png');
 		self.game.load.image('square', 'static/Images/square.png');
 		self.game.load.image('bomb', 'static/Images/bomb.png');
+		self.game.load.image('powUp', 'static/Images/powUp.png');
 		
 		self.game.load.audio('music', 'static/Sounds/251461__joshuaempyre__arcade-music-loop.wav');
 		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');

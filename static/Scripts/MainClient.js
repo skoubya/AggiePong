@@ -24,17 +24,22 @@ function MainClient(gWidth, gHeight){
 	this.paddles;
 	this.squares;
 	this.bombs;
+	this.powUps;
 	
 	this.paddleCollisionGroup;
     this.ballCollisionGroup;
 	this.bombCollisionGroup;
 	this.obsticleCollisionGroup;
+	this.powUpCollisionGroup;
 	
 	this.player_1pts = 0;
 	this.player_2pts = 0;
     
 	this.stunned = [false, false];
     
+	this.speedUp = [false, false];
+	this.paddleSpeed = [1000,1000];
+	
 	this.seconds = '00';
 	this.minutes = '2';
     
@@ -42,11 +47,13 @@ function MainClient(gWidth, gHeight){
 	this.min_num = 2;
     
 	this.bomb;
-    
+    this.powUp;
+	
 	this.ball_direction = 1;
 	this.lockBall = [];
 	this.lockBomb;
-    
+    this.lockPowUp;
+	
 	this.maxVelocity = 30;
 	this.minVelocity = 15;
 	
@@ -74,7 +81,8 @@ function MainClient(gWidth, gHeight){
 		var s = {x:square.x, y:square.y, a:square.angle};
 		var s2 = {x:square2.x, y:square2.y, a:square2.angle};
 		var bo = (self.bomb == undefined) ? null : {x:self.bomb.x, y:self.bomb.y};
-		var obj= {timer:t, balls:b, players:p, square:s, square2:s2, bomb:bo};
+		var pow = (self.powUp == undefined) ? null : {x:self.powUp.x, y:self.powUp.y};
+		var obj= {timer:t, balls:b, players:p, square:s, square2:s2, bomb:bo, powUp:pow};
 		socket.emit('render', obj);
 	}
 
@@ -90,7 +98,7 @@ function MainClient(gWidth, gHeight){
 		paddle.anchor.setTo(0.5, 0.5);
 		paddle.body.kinematic = true;
 		paddle.body.setCollisionGroup(self.paddleCollisionGroup);
-		paddle.body.collides([self.ballCollisionGroup, self.bombCollisionGroup]);
+		paddle.body.collides([self.ballCollisionGroup, self.bombCollisionGroup, self.powUpCollisionGroup]);
 		paddle.body.collideWorldBounds = true;
 	}
 
@@ -106,7 +114,7 @@ function MainClient(gWidth, gHeight){
 		square.body.velocity.x = 200;
 		square.body.static = true;
 		square.body.setCollisionGroup(self.obsticleCollisionGroup);
-		square.body.collides([self.ballCollisionGroup, self.bombCollisionGroup]);
+		square.body.collides([self.ballCollisionGroup, self.bombCollisionGroup, self.powUpCollisionGroup]);
 	}
 
 	/* Creates a bomb in a random position along the center line
@@ -123,6 +131,19 @@ function MainClient(gWidth, gHeight){
 		self.bomb.body.velocity.x = Math.random() * 200 - 100;
 		self.bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
 		self.bomb.body.collideWorldBounds = true;
+		self.ball_direction *= -1;
+	}
+	
+	this.createPowUp = function(){
+		self.powUp = self.powUps.create((Math.random() * 595), self.game.world.centerY - 12, '');
+		self.powUp.body.setCircle(24);
+		self.powUp.anchor.setTo(0.5, 0.5);
+		self.powUp.body.setCollisionGroup(self.powUpCollisionGroup);
+		self.powUp.body.collides([self.obsticleCollisionGroup]);
+		self.powUp.body.collides(self.paddleCollisionGroup,self.powUpHit,this);
+		self.powUp.body.velocity.x = Math.random() * 200 - 100;
+		self.powUp.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+		self.powUp.body.collideWorldBounds = true;
 		self.ball_direction *= -1;
 	}
 
@@ -147,6 +168,7 @@ function MainClient(gWidth, gHeight){
 		self.ballCollisionGroup = self.game.physics.p2.createCollisionGroup();
 		self.bombCollisionGroup = self.game.physics.p2.createCollisionGroup();
 		self.obsticleCollisionGroup = self.game.physics.p2.createCollisionGroup();	
+		self.powUpCollisionGroup = self.game.physics.p2.createCollisionGroup();
 		
 		/* Create paddles */
 		self.paddles = self.game.add.group();
@@ -165,6 +187,11 @@ function MainClient(gWidth, gHeight){
 		self.bombs.enableBody = true;	
 		self.bombs.physicsBodyType = Phaser.Physics.P2JS;
 		
+		/* Create powUp group */
+		self.powUps = self.game.add.group();
+		self.powUps.enableBody = true;	
+		self.powUps.physicsBodyType = Phaser.Physics.P2JS;
+		
 		/* Create square obstacles */
 		self.squares = self.game.add.group();
 		self.squares.enableBody = true;
@@ -174,6 +201,9 @@ function MainClient(gWidth, gHeight){
 		
 		/* creation of the bomb */
 		self.game.time.events.add(Phaser.Timer.SECOND * 15, self.createBomb, this);
+		
+		/* creation of the powUp */
+		self.game.time.events.add(Phaser.Timer.SECOND * 15, self.createPowUp, this);
 		
 		/* creation of the balls */
 		self.game.time.events.repeat(Phaser.Timer.SECOND * 3, 4, self.createBall, this);
@@ -264,6 +294,15 @@ function MainClient(gWidth, gHeight){
 				self.bombMissed(self.bombs.children[i]);
 			}
 		}
+		for(var i = 0; i < self.powUps.children.length; i++){
+			self.limitVelocity(self.powUps.children[i],self.maxVelocity);
+			self.addVelocity(self.powUps.children[i],self.minVelocity);
+			
+			/* Check if bomb should explode */
+			if(self.powUps.children[i].body.y < 0 || self.powUps.children[i].body.y > 800){
+				self.powUpMissed(self.powUps.children[i]);
+			}
+		}
 		
 		/* Update paddle position based off of key presses */
 		for (var i =0; i < self.paddles.children.length; i++){
@@ -278,11 +317,11 @@ function MainClient(gWidth, gHeight){
 			
 			if(self.leftDown[i] && !self.rightDown[i] && !self.stunned[i]){
 				if(minX >= 0)
-					self.paddles.children[i].body.velocity.x = -1000;
+					self.paddles.children[i].body.velocity.x = -1*self.paddleSpeed[i];
 			}
 			if(self.rightDown[i] && !self.leftDown[i] && !self.stunned[i]){
 				if(maxX <= 600)
-					self.paddles.children[i].body.velocity.x = 1000;
+					self.paddles.children[i].body.velocity.x = self.paddleSpeed[i];
 			}
 			if(self.aDown[i] && !self.dDown[i] && !self.stunned[i] && self.paddles.children[i].body.angle >= -35){
 				self.paddles.children[i].body.angle -= 3;
@@ -404,8 +443,61 @@ function MainClient(gWidth, gHeight){
 			self.lockBomb = false;
 		}, this);
 	}
-
-
+	this.powUpMissed = function(_powUp){
+		if(self.lockPowUp == true)	return;
+		self.lockPowUp = true;
+		if(_powUp.y < 50){
+			
+		}else {
+			
+		}		
+		self.game.time.events.add(Phaser.Timer.SECOND * 4, function(){ //wait a little before respawning the ball
+			_powUp.body.x = (Math.random() * 595);
+			_powUp.body.y = self.game.world.centerY - 12;
+			_powUp.body.velocity.x = Math.random() * 200 - 100;
+			_powUp.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			self.ball_direction *= -1;
+			self.lockPowUp = false;
+		}, this);
+	}
+	
+	this.powUpHit = function(_powUp, body){
+		if(self.lockPowUp == true)	return;
+		self.lockPowUp = true;
+		
+		if(_powUp.y < 400){
+			_powUp.x=1000;
+			_powUp.y=1000;
+			_powUp.velocity.x = 0;
+			_powUp.velocity.y = 0;
+			
+			self.speedUp[1] = true;
+			self.paddleSpeed[1] = 1500;
+			self.game.time.events.add(Phaser.Timer.SECOND * 5, self.speedTimer, this, 2);
+		}else {
+			_powUp.x=1000;
+			_powUp.y=1000;
+			_powUp.velocity.x = 0;
+			_powUp.velocity.y = 0;
+			self.speedUp[0] = true;
+			self.paddleSpeed[0] = 1500;
+			self.game.time.events.add(Phaser.Timer.SECOND * 5, self.speedTimer, this, 1);
+		}		
+		
+		
+		 self.game.time.events.add(Phaser.Timer.SECOND * 5, function(){ //wait a little before respawning the ball
+			_powUp.visible = true;
+			
+			_powUp.x = (Math.random() * 595);
+			_powUp.y = self.game.world.centerY - 12;
+			_powUp.velocity.x = Math.random() * 200 - 100;
+			_powUp.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			self.ball_direction *= -1;
+			self.lockPowUp = false; 
+		}, this);
+	}
+	
+	
 	/* Unstuns the specified player
 	 * Parameters:
 	 *		player - player to be unstunned
@@ -419,6 +511,17 @@ function MainClient(gWidth, gHeight){
 		}
 	}
 
+	this.speedTimer = function(player){
+		if(player == 1){
+			self.speedUp[0] = false;
+			self.paddleSpeed[0] = 1000;
+		}
+		else{
+			self.speedUp[1] = false;
+			self.paddleSpeed[1] = 1000;
+		}
+	}
+	
 	/* Handles the key events form the users */
 	socket.on('keydown', function(msg){
 		var selKey;
