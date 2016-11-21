@@ -29,6 +29,7 @@ socket.on('quit', function(msg){
 	}
 	else{
 		showMessagePage("The other player left :'( <br /> Game Over");
+		theGame.music.stop();
 	}
 	socket.disconnect();
 });
