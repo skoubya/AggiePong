@@ -3,7 +3,7 @@
  * Client that does the response calculations for the game
  *
  */
-//TODO: Posibly make a class
+//TODO: Possibly make a class
 
 function MainClient(gWidth, gHeight){
 	var self = this;
@@ -56,6 +56,8 @@ function MainClient(gWidth, gHeight){
 	
 	this.maxVelocity = 30;
 	this.minVelocity = 15;
+	
+	this.countingDown = true;
 	
 	/* Create the Phaser game */
 	this.start = function(){
@@ -123,15 +125,17 @@ function MainClient(gWidth, gHeight){
 	 *		
 	 */
 	this.createBomb = function(){
-		self.bomb = self.bombs.create((Math.random() * 595), self.game.world.centerY - 12, '');
-		self.bomb.body.setCircle(24);
-		self.bomb.anchor.setTo(0.5, 0.5);
-		self.bomb.body.setCollisionGroup(self.bombCollisionGroup);
-		self.bomb.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
-		self.bomb.body.velocity.x = Math.random() * 200 - 100;
-		self.bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
-		self.bomb.body.collideWorldBounds = true;
-		self.ball_direction *= -1;
+		if(!self.countingDown){
+			self.bomb = self.bombs.create((Math.random() * 595), self.game.world.centerY - 12, '');
+			self.bomb.body.setCircle(24);
+			self.bomb.anchor.setTo(0.5, 0.5);
+			self.bomb.body.setCollisionGroup(self.bombCollisionGroup);
+			self.bomb.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
+			self.bomb.body.velocity.x = Math.random() * 200 - 100;
+			self.bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			self.bomb.body.collideWorldBounds = true;
+			self.ball_direction *= -1;
+		}
 	}
 	
 	this.createPowUp = function(){
@@ -198,6 +202,9 @@ function MainClient(gWidth, gHeight){
 		self.squares.physicsBodyType = Phaser.Physics.P2JS;
 		self.createSquare(500, self.game.world.centerY-117);
 		self.createSquare(100, self.game.world.centerY+117);
+		
+		/* game countdown timer */
+		self.game.time.events.add(Phaser.Timer.SECOND * 4, function(){self.countingDown = false}, this);
 		
 		/* creation of the bomb */
 		self.game.time.events.add(Phaser.Timer.SECOND * 15, self.createBomb, this);
@@ -342,16 +349,18 @@ function MainClient(gWidth, gHeight){
 	 * Parameters:
 	 *		
 	 */
-	this.createBall = function(){	
-		var invBall = self.balls.create((Math.random() * 595), self.game.world.centerY - 12, '');
-		invBall.body.setCircle(24);
-		invBall.anchor.setTo(0.5, 0.5);
-		invBall.body.setCollisionGroup(self.ballCollisionGroup);
-		invBall.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
-		invBall.body.velocity.x = 200;
-		invBall.body.velocity.y = 200 * self.ball_direction;
-		invBall.body.collideWorldBounds = true;
-		self.ball_direction *= -1;	
+	this.createBall = function(){
+		if(!self.countingDown){		
+			var invBall = self.balls.create((Math.random() * 595), self.game.world.centerY - 12, '');
+			invBall.body.setCircle(24);
+			invBall.anchor.setTo(0.5, 0.5);
+			invBall.body.setCollisionGroup(self.ballCollisionGroup);
+			invBall.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
+			invBall.body.velocity.x = 200;
+			invBall.body.velocity.y = 200 * self.ball_direction;
+			invBall.body.collideWorldBounds = true;
+			self.ball_direction *= -1;	
+		}
 	}
 
 	/* Changes the timers value
@@ -359,24 +368,26 @@ function MainClient(gWidth, gHeight){
 	 *		
 	 */
 	this.updateTimer = function(){
-		self.sec_num--;  
-		//If any of the digits becomes a single digit number, pad it with a zero    
-		
-		if (self.sec_num < 0) {
-			self.sec_num = 59;
-			self.min_num--;
-		}		
-		if (self.min_num < 0){   
-			var scores = {score1:self.player_1pts, score2:self.player_2pts};
-			socket.emit('endGame', scores);
-			self.game.destroy();
-		}
-		
-		self.seconds = self.sec_num.toString();
-		self.minutes = self.min_num.toString();
-		
-		if (self.sec_num < 10) {
-			self.seconds = '0' + self.seconds;
+		if(!self.countingDown){
+			self.sec_num--;  
+			//If any of the digits becomes a single digit number, pad it with a zero    
+			
+			if (self.sec_num < 0) {
+				self.sec_num = 59;
+				self.min_num--;
+			}		
+			if (self.min_num < 0){   
+				var scores = {score1:self.player_1pts, score2:self.player_2pts};
+				socket.emit('endGame', scores);
+				self.game.destroy();
+			}
+			
+			self.seconds = self.sec_num.toString();
+			self.minutes = self.min_num.toString();
+			
+			if (self.sec_num < 10) {
+				self.seconds = '0' + self.seconds;
+			}
 		}
 	}
 

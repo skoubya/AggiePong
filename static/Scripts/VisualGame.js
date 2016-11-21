@@ -28,6 +28,8 @@ function VisualGame(playerID, gWidth, gHeight){
 	
 	this.explosionSound = null;
 	this.music = null;
+	
+	this.countdownNum = 3;
 
 	/* Creates the Phaser game */
 	this.start = function(){
@@ -106,8 +108,15 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.image('bomb', 'static/Images/bomb.png');
 		self.game.load.image('powUp', 'static/Images/powUp.png');
 		
+		self.game.load.image('number_0', 'static/Images/number_0.png');
+		self.game.load.image('number_1', 'static/Images/number_1.png');
+		self.game.load.image('number_2', 'static/Images/number_2.png');
+		self.game.load.image('number_3', 'static/Images/number_3.png');
+		
 		self.game.load.audio('music', 'static/Sounds/251461__joshuaempyre__arcade-music-loop.wav');
 		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');
+		self.game.load.audio('countdown', 'static/Sounds/countdown_1.wav');
+		self.game.load.audio('go', 'static/Sounds/countdown_0.wav');
 		
 		self.game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
@@ -144,22 +153,56 @@ function VisualGame(playerID, gWidth, gHeight){
 		square2.anchor.setTo(0.5,0.5);
 		
 		self.explosionSound = self.game.add.audio('boom');
+		self.countdownSound = self.game.add.audio('countdown');
+		self.goSound = self.game.add.audio('go');
 		self.music = self.game.add.audio('music');
 		self.music.loop = true;
-		self.music.play();
 		
 		
 		self.cursors = self.game.input.keyboard.createCursorKeys();
+		self.countdown();
 		self.startGameEvents();
 	};
+	
+	
+	this.countdown = function(){
+		
+		var number = self.game.add.sprite(self.game.world.centerX, self.game.world.centerY, 'number_' + self.countdownNum);
+		number.anchor.setTo(0.5, 0.5);
+		number.scale.setTo(.01, .01);
+		var tween1 = self.game.add.tween(number.scale).to({x: 2, y: 2}, 1000, Phaser.Easing.Quartic.Out);
+		var tween2 = self.game.add.tween(number).to({alpha: 0}, 300, Phaser.Easing.Linear.In);
+		tween1.chain(tween2);
+		if(self.countdownNum>0){
+			self.countdownSound.play();
+			self.countdownNum--;
+			tween2.onComplete.add(self.countdown, this);
+		}
+		else{
+			self.goSound.play();
+			self.game.time.events.add(500,function(){self.music.play()}, this);
+		}
+		tween1.start();
+		
+	}
+	
 
-	/* Explosion animation */
+	/* Explosion animation and blinking paddle */
 	this.explode = function(xpos, ypos){
 		if(ypos < 100){
 			ypos = ypos + 30;
+			
+			self.game.time.events.repeat(200, 9, function(){self.paddles.children[(self.pid+1)%2].tint = 0x061e1e;}, this);
+			self.game.time.events.add(100, function(){self.game.time.events.repeat(200, 9, function(){self.paddles.children[(self.pid+1)%2].tint = 0xffffff;}, this)}, this);
+			
+			//self.game.time.events.add(2000, function(){self.paddles.children[(self.pid+1)%2].tint = 0xffffff;}, this);
 		}
 		else{
 			ypos = ypos - 30;
+			self.game.time.events.repeat(200, 9, function(){self.paddles.children[self.pid].tint = 0x061e1e;}, this);
+			self.game.time.events.add(100, function(){self.game.time.events.repeat(200, 9, function(){self.paddles.children[self.pid].tint = 0xffffff;}, this)}, this);
+			//self.game.time.events.add(2000, function(){self.paddles.children[self.pid].tint = 0xffffff;}, this);
+
 		}
 		
 		self.explosionSound.play();
