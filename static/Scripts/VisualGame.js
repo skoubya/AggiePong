@@ -165,13 +165,22 @@ function VisualGame(playerID, gWidth, gHeight){
 	}
 	
 
-	/* Explosion animation */
+	/* Explosion animation and blinking paddle */
 	this.explode = function(xpos, ypos){
 		if(ypos < 100){
 			ypos = ypos + 30;
+			
+			self.game.time.events.repeat(200, 9, function(){self.paddles.children[(self.pid+1)%2].tint = 0x061e1e;}, this);
+			self.game.time.events.add(100, function(){self.game.time.events.repeat(200, 9, function(){self.paddles.children[(self.pid+1)%2].tint = 0xffffff;}, this)}, this);
+			
+			//self.game.time.events.add(2000, function(){self.paddles.children[(self.pid+1)%2].tint = 0xffffff;}, this);
 		}
 		else{
 			ypos = ypos - 30;
+			self.game.time.events.repeat(200, 9, function(){self.paddles.children[self.pid].tint = 0x061e1e;}, this);
+			self.game.time.events.add(100, function(){self.game.time.events.repeat(200, 9, function(){self.paddles.children[self.pid].tint = 0xffffff;}, this)}, this);
+			//self.game.time.events.add(2000, function(){self.paddles.children[self.pid].tint = 0xffffff;}, this);
+
 		}
 		
 		self.explosionSound.play();
