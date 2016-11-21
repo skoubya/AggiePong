@@ -24,6 +24,9 @@ function VisualGame(playerID, gWidth, gHeight){
 	this.timer = null;
 	this.score_1 = null;
 	this.score_2 = null;
+	
+	this.explosionSound = null;
+	this.music = null;
 
 	/* Creates the Phaser game */
 	this.start = function(){
@@ -89,6 +92,9 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.image('square', 'static/Images/square.png');
 		self.game.load.image('bomb', 'static/Images/bomb.png');
 		
+		self.game.load.audio('music', 'static/Sounds/251461__joshuaempyre__arcade-music-loop.wav');
+		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');
+		
 		self.game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
 		self.game.load.bitmapFont('carrier', 'static/Images/carrier_command.png', 'static/Images/carrier_command.xml');	
@@ -123,6 +129,12 @@ function VisualGame(playerID, gWidth, gHeight){
 		var square2 = self.squares.create(100,self.game.world.centerY+117,'square');
 		square2.anchor.setTo(0.5,0.5);
 		
+		self.explosionSound = self.game.add.audio('boom');
+		self.music = self.game.add.audio('music');
+		self.music.loop = true;
+		self.music.play();
+		
+		
 		self.cursors = self.game.input.keyboard.createCursorKeys();
 		self.startGameEvents();
 	};
@@ -135,6 +147,8 @@ function VisualGame(playerID, gWidth, gHeight){
 		else{
 			ypos = ypos - 30;
 		}
+		
+		self.explosionSound.play();
 		
 		var explosion = self.game.add.sprite(xpos, ypos, 'explosion');
 		explosion.anchor.setTo(.5, .5);

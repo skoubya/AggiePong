@@ -74,9 +74,17 @@ socket.on('endGame', function(obj){
 	}
 	else if((obj.score1 > obj.score2 && pid == 0) || (obj.score1 < obj.score2 && pid == 1)){
 		showMessagePage('Game Over<br />You win <br />'+score);
+		theGame.music.stop();
+		var sound = document.createElement('audio');
+		sound.setAttribute('src', 'static/Sounds/yeehaw.wav');
+		sound.play()
 	}
 	else{
 		showMessagePage('Game Over<br />You lose <br />'+score);
+		theGame.music.stop();
+		var sound = document.createElement('audio');
+		sound.setAttribute('src', 'static/Sounds/boohiss.wav');
+		sound.play()
 	}
 	socket.disconnect();
 });

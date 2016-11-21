@@ -15,6 +15,7 @@ function MainClient(gWidth, gHeight){
 	this.rightDown = [false, false];
 	this.aDown = [false, false];
 	this.dDown = [false, false];
+	this.sDown = [false, false];
     
 	this.gameWidth = gWidth;
 	this.gameHeight = gHeight; 
@@ -22,6 +23,7 @@ function MainClient(gWidth, gHeight){
 	this.balls;
 	this.paddles;
 	this.squares;
+	this.bombs;
 	
 	this.paddleCollisionGroup;
     this.ballCollisionGroup;
@@ -113,14 +115,14 @@ function MainClient(gWidth, gHeight){
 	 *		
 	 */
 	this.createBomb = function(){
-		bomb = self.bombs.create((Math.random() * 595), self.game.world.centerY - 12, '');
-		bomb.body.setCircle(24);
-		bomb.anchor.setTo(0.5, 0.5);
-		bomb.body.setCollisionGroup(self.bombCollisionGroup);
-		bomb.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
-		bomb.body.velocity.x = Math.random() * 200 - 100;
-		bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
-		bomb.body.collideWorldBounds = true;
+		self.bomb = self.bombs.create((Math.random() * 595), self.game.world.centerY - 12, '');
+		self.bomb.body.setCircle(24);
+		self.bomb.anchor.setTo(0.5, 0.5);
+		self.bomb.body.setCollisionGroup(self.bombCollisionGroup);
+		self.bomb.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
+		self.bomb.body.velocity.x = Math.random() * 200 - 100;
+		self.bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+		self.bomb.body.collideWorldBounds = true;
 		self.ball_direction *= -1;
 	}
 
@@ -288,6 +290,9 @@ function MainClient(gWidth, gHeight){
 			if(self.dDown[i] && !self.aDown[i] && !self.stunned[i] && self.paddles.children[i].body.angle <= 35){
 				self.paddles.children[i].body.angle += 3;
 			}
+			if(self.sDown[i] && !self.stunned[i] ){
+				self.paddles.children[i].body.angle = 0;
+			}
 		}
 		
 	}
@@ -428,6 +433,9 @@ function MainClient(gWidth, gHeight){
 		else if (msg.key == 68){
 			selKey = "tRight";
 		}
+		else if (msg.key == 83){
+			selKey = "center";
+		}
 		
 		
 		if(selKey == "left" && !self.leftDown[msg.id]){//left			
@@ -446,6 +454,10 @@ function MainClient(gWidth, gHeight){
 			console.log("Player " + msg.id + " Tilting Right");
 			self.dDown[msg.id] = true;
 		}
+		if(selKey == "center" & !self.sDown[msg.id]){
+			console.log("Player " + msg.id + "Centering Tilting");
+			self.sDown[msg.id] = true;
+		}
 	});
 	socket.on('keyup', function(msg){
 		var selKey = "";
@@ -459,6 +471,9 @@ function MainClient(gWidth, gHeight){
 		}
 		else if (msg.key == 68){
 			selKey = "tRight";
+		}
+		else if (msg.key == 83){
+			selKey = "center";
 		}
 		
 		if(selKey == "left" && self.leftDown[msg.id]){
@@ -476,6 +491,10 @@ function MainClient(gWidth, gHeight){
 		if(selKey == "tRight" && self.dDown [msg.id]){
 			console.log("Player " + msg.id + " Stop Tilting Right");
 			self.dDown[msg.id] = false;
+		}
+		if(selKey == "center" & self.sDown[msg.id]){
+			console.log("Player " + msg.id + "Stop Centering Tilting");
+			self.sDown[msg.id] = false;
 		}
 	});
 }
