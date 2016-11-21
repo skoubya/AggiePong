@@ -27,6 +27,8 @@ function VisualGame(playerID, gWidth, gHeight){
 	
 	this.explosionSound = null;
 	this.music = null;
+	
+	this.countdownNum = 3;
 
 	/* Creates the Phaser game */
 	this.start = function(){
@@ -92,6 +94,11 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.image('square', 'static/Images/square.png');
 		self.game.load.image('bomb', 'static/Images/bomb.png');
 		
+		self.game.load.image('number_0', 'static/Images/number_0.png');
+		self.game.load.image('number_1', 'static/Images/number_1.png');
+		self.game.load.image('number_2', 'static/Images/number_2.png');
+		self.game.load.image('number_3', 'static/Images/number_3.png');
+		
 		self.game.load.audio('music', 'static/Sounds/251461__joshuaempyre__arcade-music-loop.wav');
 		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');
 		
@@ -136,8 +143,27 @@ function VisualGame(playerID, gWidth, gHeight){
 		
 		
 		self.cursors = self.game.input.keyboard.createCursorKeys();
+		self.countdown();
 		self.startGameEvents();
 	};
+	
+	
+	this.countdown = function(){
+		
+		var number = self.game.add.sprite(self.game.world.centerX, self.game.world.centerY, 'number_' + self.countdownNum);
+		number.anchor.setTo(0.5, 0.5);
+		number.scale.setTo(.01, .01);
+		var tween1 = self.game.add.tween(number.scale).to({x: 2, y: 2}, 1000, Phaser.Easing.Quartic.Out);
+		var tween2 = self.game.add.tween(number).to({alpha: 0}, 300, Phaser.Easing.Linear.In);
+		tween1.chain(tween2);
+		if(self.countdownNum>0){
+			self.countdownNum--;
+			tween2.onComplete.add(self.countdown, this);
+		}
+		tween1.start();
+
+	}
+	
 
 	/* Explosion animation */
 	this.explode = function(xpos, ypos){
