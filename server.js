@@ -64,6 +64,9 @@ io.on('connection', function(socket){
 	socket.on('endGame', function(obj){
 		io.sockets.emit('endGame', obj);
 	});
+	socket.on('powerup', function(obj){
+		io.sockets.emit('powerup', obj);
+	});
 });
 
 /* Start listening on the server */

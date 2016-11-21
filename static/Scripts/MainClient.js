@@ -476,6 +476,8 @@ function MainClient(gWidth, gHeight){
 		if(self.lockPowUp == true)	return;
 		self.lockPowUp = true;
 		
+		socket.emit('powerup', '');
+		
 		if(_powUp.y < 400){
 			_powUp.x=1000;
 			_powUp.y=1000;

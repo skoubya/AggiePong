@@ -28,8 +28,12 @@ function VisualGame(playerID, gWidth, gHeight){
 	
 	this.explosionSound = null;
 	this.music = null;
+	this.countdownSound = null;
+	this.goSound = null;
+	this.powerupSound = null;
 	
 	this.countdownNum = 3;
+	this.powerupSoundLock = false;
 
 	/* Creates the Phaser game */
 	this.start = function(){
@@ -97,6 +101,9 @@ function VisualGame(playerID, gWidth, gHeight){
 		socket.on('explode', function(obj){
 			self.explode((self.pid==0)? obj.x: self.gameWidth-obj.x, (self.pid==0)? obj.y: self.gameHeight-obj.y);
 		});
+		socket.on('powerup', function(obj){
+			self.powerupSound.play();
+		});
 	};
 	
 	/* Functions for Phaser */
@@ -117,6 +124,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.audio('boom', 'static/Sounds/Explosion+3.wav');
 		self.game.load.audio('countdown', 'static/Sounds/countdown_1.wav');
 		self.game.load.audio('go', 'static/Sounds/countdown_0.wav');
+		self.game.load.audio('powerUp', 'static/Sounds/220173__gameaudio__spacey-1up-power-up.wav');
 		
 		self.game.load.spritesheet('explosion', 'static/Images/explosion.png', 319, 60, 22);
 
@@ -155,6 +163,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.explosionSound = self.game.add.audio('boom');
 		self.countdownSound = self.game.add.audio('countdown');
 		self.goSound = self.game.add.audio('go');
+		self.powerupSound = self.game.add.audio('powerUp');
 		self.music = self.game.add.audio('music');
 		self.music.loop = true;
 		
@@ -180,7 +189,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		}
 		else{
 			self.goSound.play();
-			self.game.time.events.add(500,function(){self.music.play()}, this);
+			//self.game.time.events.add(500,function(){self.music.play()}, this);
 		}
 		tween1.start();
 		
