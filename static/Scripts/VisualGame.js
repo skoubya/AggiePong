@@ -189,7 +189,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		}
 		else{
 			self.goSound.play();
-			//self.game.time.events.add(500,function(){self.music.play()}, this);
+			self.game.time.events.add(500,function(){self.music.play()}, this);
 		}
 		tween1.start();
 		
