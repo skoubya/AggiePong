@@ -17,7 +17,7 @@ function choose(sel){
 		$("head").append("<script src='/socket.io/socket.io.js'></script> \n <script type='text/javascript' src='static/Scripts/Waiting.js'></script>");
 	}
 	else if(sel=="howToPlay"){
-		var howToPlay = "<u>How to Play</u><br />The purpose of this game is to protect your goal from having anything go into it.  If you let a ball past, the other player gets a point. If you stop a power-up ball from getting past (i.e. it hits your paddle), you get the power-up.  If you let a bomb past, you will be temporarily stunned. <br /><br /> <u>Keys</u><br /> <table><tr><th>Left arrow</th><th> - </th><th class='left'>move paddle left</th></tr><tr><th>Right arrow</th><th> - </th><th class='left'>move paddle right</th></tr><tr><th>\\\"A\\\" key</th><th> - </th><th class='left'>rotate counter-clockwise</th></tr><tr><th>\\\"D\\\" key</th><th> - </th><th class='left'>rotate clockwise</th></tr></table>";
+		var howToPlay = "<u>How to Play</u><br />The purpose of this game is to protect your goal from having anything go into it.  If you let a ball past, the other player gets a point. If you stop a power-up ball from getting past (i.e. it hits your paddle), you get the power-up.  If you let a bomb past, you will be temporarily stunned. <br /><br /> <u>Keys</u><br /> <table><tr><th>Left arrow</th><th> - </th><th class='left'>move paddle left</th></tr><tr><th>Right arrow</th><th> - </th><th class='left'>move paddle right</th></tr><tr><th>\\\"A\\\" key</th><th> - </th><th class='left'>rotate counter-clockwise</th></tr><tr><th>\\\"D\\\" key</th><th> - </th><th class='left'>rotate clockwise</th></tr><tr><th>\\\"S\\\" key</th><th> - </th><th class='left'>return paddle to horizontal</th></tr></table>";
 		showMessagePage(howToPlay);
 	}
 	else{
