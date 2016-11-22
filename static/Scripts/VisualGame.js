@@ -31,6 +31,7 @@ function VisualGame(playerID, gWidth, gHeight){
 	this.countdownSound = null;
 	this.goSound = null;
 	this.powerupSound = null;
+	this.powUpEmitter = null;
 	
 	this.countdownNum = 3;
 	this.powerupSoundLock = false;
@@ -103,6 +104,10 @@ function VisualGame(playerID, gWidth, gHeight){
 		});
 		socket.on('powerup', function(obj){
 			self.powerupSound.play();
+			self.powUpEmitter.on = true;
+			self.paddleShine(obj);
+			self.game.time.events.repeat(100, 50, self.paddleShine, this, obj);
+			self.game.time.events.add(5000, function(){self.powUpEmitter.on = false;}, this);
 		});
 	};
 	
@@ -114,6 +119,7 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.game.load.image('square', 'static/Images/square.png');
 		self.game.load.image('bomb', 'static/Images/bomb.png');
 		self.game.load.image('powUp', 'static/Images/powUp.png');
+		self.game.load.image('powUpParticle', 'static/Images/powUpParticle.png');
 		
 		self.game.load.image('number_0', 'static/Images/number_0.png');
 		self.game.load.image('number_1', 'static/Images/number_1.png');
@@ -167,6 +173,13 @@ function VisualGame(playerID, gWidth, gHeight){
 		self.music = self.game.add.audio('music');
 		self.music.loop = true;
 		
+		self.powUpEmitter = self.game.add.emitter(self.game.world.centerX, self.paddles.children[pid].y, 200);
+		self.powUpEmitter.makeParticles('powUpParticle');
+		self.powUpEmitter.gravity = 175;
+		self.powUpEmitter.setAlpha(.3, .6);
+		self.powUpEmitter.setScale(0.4, 0, 0.4, 0, 3000);
+		self.powUpEmitter.start(false, 200, 50);
+		self.powUpEmitter.on = false;
 		
 		self.cursors = self.game.input.keyboard.createCursorKeys();
 		self.countdown();
@@ -223,4 +236,12 @@ function VisualGame(playerID, gWidth, gHeight){
 		animate_explode.play('explode', 28, true);
 		animate_explode.loop = false;
 	};
+	
+	this.paddleShine = function(pid){
+		
+		console.log(self.paddles.children[pid].x);
+		console.log(self.paddles.children[pid].y);
+		self.powUpEmitter.emitX = self.paddles.children[pid].x + (Math.random() - 0.5) * 40;
+		self.powUpEmitter.emitY = self.paddles.children[pid].y;
+	}
 }

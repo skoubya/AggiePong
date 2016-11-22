@@ -476,7 +476,6 @@ function MainClient(gWidth, gHeight){
 		if(self.lockPowUp == true)	return;
 		self.lockPowUp = true;
 		
-		socket.emit('powerup', '');
 		
 		if(_powUp.y < 400){
 			_powUp.x=1000;
@@ -487,6 +486,7 @@ function MainClient(gWidth, gHeight){
 			self.speedUp[1] = true;
 			self.paddleSpeed[1] = 1500;
 			self.game.time.events.add(Phaser.Timer.SECOND * 5, self.speedTimer, this, 2);
+			socket.emit('powerup', '1'); //passes player id
 		}else {
 			_powUp.x=1000;
 			_powUp.y=1000;
@@ -495,6 +495,7 @@ function MainClient(gWidth, gHeight){
 			self.speedUp[0] = true;
 			self.paddleSpeed[0] = 1500;
 			self.game.time.events.add(Phaser.Timer.SECOND * 5, self.speedTimer, this, 1);
+			socket.emit('powerup', '0');
 		}		
 		
 		
