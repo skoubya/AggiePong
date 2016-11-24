@@ -84,7 +84,7 @@ socket.on('endGame', function(obj){
 		showMessagePage('Game Over<br />You lose <br />'+score);
 		theGame.music.stop();
 		var sound = document.createElement('audio');
-		sound.setAttribute('src', 'static/Sounds/boohiss.wav');
+		sound.setAttribute('src', 'static/Sounds/336998__corsica-s__awww-01.wav');
 		sound.play()
 	}
 	socket.disconnect();

@@ -54,8 +54,9 @@ function MainClient(gWidth, gHeight){
 	this.lockBomb;
     this.lockPowUp;
 	
-	this.maxVelocity = 30;
-	this.minVelocity = 15;
+	this.maxVelocity = 400;
+	this.minVelocity = 200;
+	this.minYVelocity = 10;
 	
 	this.countingDown = true;
 	
@@ -132,7 +133,7 @@ function MainClient(gWidth, gHeight){
 			self.bomb.body.setCollisionGroup(self.bombCollisionGroup);
 			self.bomb.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
 			self.bomb.body.velocity.x = Math.random() * 200 - 100;
-			self.bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			self.bomb.body.velocity.y = (Math.random() * 50 + 50) * self.ball_direction;
 			self.bomb.body.collideWorldBounds = true;
 			self.ball_direction *= -1;
 		}
@@ -146,7 +147,7 @@ function MainClient(gWidth, gHeight){
 		self.powUp.body.collides([self.obsticleCollisionGroup]);
 		self.powUp.body.collides(self.paddleCollisionGroup,self.powUpHit,this);
 		self.powUp.body.velocity.x = Math.random() * 200 - 100;
-		self.powUp.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+		self.powUp.body.velocity.y = (Math.random() * 50 + 50) * self.ball_direction;
 		self.powUp.body.collideWorldBounds = true;
 		self.ball_direction *= -1;
 	}
@@ -230,8 +231,8 @@ function MainClient(gWidth, gHeight){
 	  var body = sprite.body;
 	  var angle, currVelocitySqr, vx, vy;
 
-	  vx = body.data.velocity[0];
-	  vy = body.data.velocity[1];
+	  vx = body.velocity.x; //body.data.velocity[0];
+	  vy = body.velocity.y; //body.data.velocity[1];
 	  
 	  currVelocitySqr = vx * vx + vy * vy;
 	  
@@ -241,8 +242,10 @@ function MainClient(gWidth, gHeight){
 		vx = Math.cos(angle) * maxVelocity;
 		vy = Math.sin(angle) * maxVelocity;
 		
-		body.data.velocity[0] = vx;
-		body.data.velocity[1] = vy;
+		//body.data.velocity[0] = vx;
+		//body.data.velocity[1] = vy;
+		body.velocity.x = vx;
+		body.velocity.y = vy;
 	  }
 	}
 
@@ -251,12 +254,12 @@ function MainClient(gWidth, gHeight){
 	 *		sprite - the object whose velocity is being increased
 	 *		minVelocity - the slowest the object should go
 	 */
-	this.addVelocity = function(sprite, minVelocity){
+	this.addVelocity = function(sprite, minVelocity, minYVelocity){
 	  var body = sprite.body;
 	  var angle, currVelocitySqr, vx, vy;
 
-	  vx = body.data.velocity[0];
-	  vy = body.data.velocity[1];
+	  vx = body.velocity.x;//body.data.velocity[0];
+	  vy = body.velocity.y;//body.data.velocity[1];
 	  
 	  currVelocitySqr = vx * vx + vy * vy;
 	  
@@ -266,8 +269,21 @@ function MainClient(gWidth, gHeight){
 		vx = Math.cos(angle) * minVelocity; //was maxVelocity
 		vy = Math.sin(angle) * minVelocity; //was maxVelocity
 		
-		body.data.velocity[0] = vx;
-		body.data.velocity[1] = vy;
+		//body.data.velocity[0] = vx;
+		//body.data.velocity[1] = vy;
+		body.velocity.x = vx;
+		body.velocity.y = vy;
+	  }
+	  
+	  if (Math.abs(vy) <= minYVelocity){
+		  //body.data.velocity[1] = vy/Math.abs(vy)* minYVelocity;
+		  if (vy == 0){
+			body.velocity.y = self.ball_direction * minYVelocity;
+			self.ball_direction *= -1;
+		  }
+		  else{
+			body.velocity.y = vy/Math.abs(vy)* minYVelocity;
+		  }
 	  }
 
 	}
@@ -285,7 +301,7 @@ function MainClient(gWidth, gHeight){
 		}	
 		for(var i = 0; i < self.balls.children.length; i++){
 			self.limitVelocity(self.balls.children[i],self.maxVelocity);
-			self.addVelocity(self.balls.children[i],self.minVelocity);
+			self.addVelocity(self.balls.children[i],self.minVelocity, self.minYVelocity);
 			
 			/* Check if ball scored */
 			if(self.balls.children[i].body.y < 0 || self.balls.children[i].body.y > 800){
@@ -294,7 +310,7 @@ function MainClient(gWidth, gHeight){
 		}
 		for(var i = 0; i < self.bombs.children.length; i++){
 			self.limitVelocity(self.bombs.children[i],self.maxVelocity);
-			self.addVelocity(self.bombs.children[i],self.minVelocity);
+			self.addVelocity(self.bombs.children[i],self.minVelocity, self.minYVelocity);
 			
 			/* Check if bomb should explode */
 			if(self.bombs.children[i].body.y < 0 || self.bombs.children[i].body.y > 800){
@@ -303,7 +319,7 @@ function MainClient(gWidth, gHeight){
 		}
 		for(var i = 0; i < self.powUps.children.length; i++){
 			self.limitVelocity(self.powUps.children[i],self.maxVelocity);
-			self.addVelocity(self.powUps.children[i],self.minVelocity);
+			self.addVelocity(self.powUps.children[i],self.minVelocity, self.minYVelocity);
 			
 			/* Check if bomb should explode */
 			if(self.powUps.children[i].body.y < 0 || self.powUps.children[i].body.y > 800){
@@ -356,8 +372,8 @@ function MainClient(gWidth, gHeight){
 			invBall.anchor.setTo(0.5, 0.5);
 			invBall.body.setCollisionGroup(self.ballCollisionGroup);
 			invBall.body.collides([self.paddleCollisionGroup,  self.obsticleCollisionGroup]);
-			invBall.body.velocity.x = 200;
-			invBall.body.velocity.y = 200 * self.ball_direction;
+			invBall.body.velocity.x = 100;
+			invBall.body.velocity.y = 100 * self.ball_direction;
 			invBall.body.collideWorldBounds = true;
 			self.ball_direction *= -1;	
 		}
@@ -419,7 +435,7 @@ function MainClient(gWidth, gHeight){
 			_ball.body.x = (Math.random() * 595);
 			_ball.body.y = self.game.world.centerY - 12;
 			_ball.body.velocity.x = Math.random() * 200 - 100;
-			_ball.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			_ball.body.velocity.y = (Math.random() * 50 + 50) * self.ball_direction;
 			self.ball_direction *= -1;
 			self.lockBall[ballInd] = false;
 		}, this);
@@ -449,7 +465,7 @@ function MainClient(gWidth, gHeight){
 			_bomb.body.x = (Math.random() * 595);
 			_bomb.body.y = self.game.world.centerY - 12;
 			_bomb.body.velocity.x = Math.random() * 200 - 100;
-			_bomb.body.velocity.y = (Math.random() * 200 + 400) * self.ball_direction;
+			_bomb.body.velocity.y = (Math.random() * 50 + 50) * self.ball_direction;
 			self.ball_direction *= -1;
 			self.lockBomb = false;
 		}, this);
@@ -484,7 +500,7 @@ function MainClient(gWidth, gHeight){
 			_powUp.velocity.y = 0;
 			
 			self.speedUp[1] = true;
-			self.paddleSpeed[1] = 1500;
+			self.paddleSpeed[1] = 2000;//1500;
 			self.game.time.events.add(Phaser.Timer.SECOND * 5, self.speedTimer, this, 2);
 			socket.emit('powerup', '1'); //passes player id
 		}else {

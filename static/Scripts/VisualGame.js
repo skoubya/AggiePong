@@ -238,9 +238,6 @@ function VisualGame(playerID, gWidth, gHeight){
 	};
 	
 	this.paddleShine = function(pid){
-		
-		console.log(self.paddles.children[pid].x);
-		console.log(self.paddles.children[pid].y);
 		self.powUpEmitter.emitX = self.paddles.children[pid].x + (Math.random() - 0.5) * 40;
 		self.powUpEmitter.emitY = self.paddles.children[pid].y;
 	}
