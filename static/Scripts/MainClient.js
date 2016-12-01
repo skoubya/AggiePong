@@ -54,7 +54,7 @@ function MainClient(gWidth, gHeight){
 	this.lockBomb;
     this.lockPowUp;
 	
-	this.maxVelocity = 400;
+	this.maxVelocity = 700;
 	this.minVelocity = 200;
 	this.minYVelocity = 10;
 	
