@@ -22,3 +22,10 @@ IdeaMache: https://ideamache.ecologylab.net/e/1IBm1lgzDt/
 Formative User Study: https://docs.google.com/document/d/1yirvKkHMFbN5Ug0NiXDaEiKn_S3DPoEtcuW9KrwaJyk/edit
 
 ---
+Deliverable 6 Resubmission
+
+IdeaMache: https://ideamache.ecologylab.net/e/hxjSJjZ4wj/
+
+Report of Game Changes: https://docs.google.com/document/d/15nQnYZM-L-b1OgaTGHdizA0u6ybutDRQFr5gpMeYA84/edit
+
+---
