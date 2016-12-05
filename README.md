@@ -14,6 +14,8 @@ Functional Specification:  https://docs.google.com/document/d/196JPkRYudqoyGv-kW
 
 Changes: https://docs.google.com/document/d/15nQnYZM-L-b1OgaTGHdizA0u6ybutDRQFr5gpMeYA84
 
+Video: https://www.youtube.com/watch?v=JjXTiLVgUso
+
 ---
 Deliverable 5 Resubmission
 
