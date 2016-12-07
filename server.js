@@ -5,7 +5,7 @@
  */
  
 
-var socketNum = 10072;
+var socketNum = 10071;
 
 /* Server variables */
 var express = require('express');

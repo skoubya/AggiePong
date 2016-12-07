@@ -3,7 +3,6 @@
  * Client that does the response calculations for the game
  *
  */
-//TODO: Possibly make a class
 
 function MainClient(gWidth, gHeight){
 	var self = this;
