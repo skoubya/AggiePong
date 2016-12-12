@@ -14,4 +14,6 @@ Functional Specification:  https://docs.google.com/document/d/196JPkRYudqoyGv-kW
 
 Changes: https://docs.google.com/document/d/15nQnYZM-L-b1OgaTGHdizA0u6ybutDRQFr5gpMeYA84
 
-Video: https://youtu.be/5iQLpkaLabo
+Video: https://youtu.be/5iQLpkaLabo  
+
+Final Report: https://drive.google.com/file/d/0B5AV9buEK3L-c1VJX1FwZktkdlk/view
