@@ -1,10 +1,14 @@
 # AggiePong
 
-TO RUN:
+A multiplayer web-based game.  Two players connect to the same webpage to play against each other. 
+
+## How to Run
 
 In terminal: run `node server.js` in AggiePong folder
 
-Open page "compute.cs.tamu.edu:10072" (or whatever port number you changed to in the server.js file)  
+Open page "\<local machine address\>:\<port number indicated in server.js\>"
+
+## Additional Information
 
 IdeaMache: https://ideamache.ecologylab.net/e/o7xZ23X9tg/
 
